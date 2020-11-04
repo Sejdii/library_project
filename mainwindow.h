@@ -3,19 +3,31 @@
 
 #include <QMainWindow>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+
+    void setWindow();
+    void setStage(QString stage);
+
+private slots:
+    void loginAsClientSlot();
+    void loginAsWorkerSlot();
+    void registerAsClientSlot();
 
 private:
-    Ui::MainWindow *ui;
+    void stage_homepage();
+    void create_menu();
+    void create_actions();
+
+    QMenu* loginMenu;
+    QMenu* registerMenu;
+
+    QAction* loginAsClient;
+    QAction* loginAsWorker;
+    QAction* registerAsClient;
 };
 #endif // MAINWINDOW_H
