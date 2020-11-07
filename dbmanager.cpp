@@ -56,12 +56,13 @@ bool DBManager::initial_database(const QString& path)
 
     // CREATING CLIENT TABLE
     value = "CREATE TABLE client("
-                  "pesel varchar(11) NOT NULL PRIMARY KEY,"
-                  "card_nr varchar(6) NOT NULL UNIQUE,"
+                  "id int NOT NULL PRIMARY KEY AUTOINCREMENT,"
+                  "login varchar(16) NOT NULL UNIQUE,"
                   "password varchar(255) NOT NULL,"
+                  "pesel varchar(11) NOT NULL,"
+                  "card_nr varchar(6) NOT NULL UNIQUE,"
                   "name varchar(64) NOT NULL,"
                   "surname varchar(6) NOT NULL,"
-                  "birthdate date NOT NULL,"
                   "city varchar(32) NOT NULL,"
                   "zip_code varchar(6) NOT NULL,"
                   "street varchar(64) NOT NULL,"
@@ -75,7 +76,8 @@ bool DBManager::initial_database(const QString& path)
 
     // CREATING WORKER TABLE
     value = "CREATE TABLE worker("
-                  "pesel varchar(11) NOT NULL PRIMARY KEY,"
+                  "id int NOT NULL PRIMARY KEY AUTOINCREMENT,"
+                  "pesel varchar(11) NOT NULL UNIQUE,"
                   "login varchar(16) NOT NULL UNIQUE,"
                   "password varchar(255) NOT NULL,"
                   "name varchar(64) NOT NULL,"
@@ -95,8 +97,8 @@ bool DBManager::initial_database(const QString& path)
                   "start_date date NOT NULL,"
                   "end_date date NOT NULL,"
                   "FOREIGN KEY(book_id) REFERENCES book(id),"
-                  "FOREIGN KEY(worker_id) REFERENCES worker(pesel),"
-                  "FOREIGN KEY(client_id) REFERENCES client(pesel)"
+                  "FOREIGN KEY(worker_id) REFERENCES worker(id),"
+                  "FOREIGN KEY(client_id) REFERENCES client(id)"
                   ");";
    if(!query.exec(value)) {
        qDebug() << "Add worker table error:" << query.lastError();

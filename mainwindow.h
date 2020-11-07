@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLineEdit>
+#include <QFormLayout>
+#include <QDateEdit>
 
 class MainWindow : public QMainWindow
 {
@@ -20,8 +23,13 @@ private slots:
 
 private:
     void stage_homepage();
+    void stage_login_client();
+    void stage_register_client();
+
     void create_menu();
     void create_actions();
+
+    QWidget *widget;
 
     QMenu* loginMenu;
     QMenu* registerMenu;
