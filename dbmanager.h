@@ -10,7 +10,7 @@ class DBManager
 {
 public:
     DBManager(const QString& path);
-    static bool initial_database(const QString& path);
+    static bool initial_database(const QString& path, bool force=false);
 
 private:
     QSqlDatabase database;

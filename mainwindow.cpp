@@ -94,60 +94,70 @@ void MainWindow::stage_register_client()
 {
     setWindowTitle("Zarejestruj się");
 
-    QLineEdit* login = new QLineEdit;
-    login->setPlaceholderText("Login");
+    register_login = new QLineEdit;
+    register_login->setPlaceholderText("Login");
 
-    QLineEdit* password = new QLineEdit;
-    password->setPlaceholderText("Hasło");
-    password->setEchoMode(QLineEdit::Password);
+    register_password = new QLineEdit;
+    register_password->setPlaceholderText("Hasło");
+    register_password->setEchoMode(QLineEdit::Password);
 
-    QLineEdit* password_repeat = new QLineEdit;
-    password_repeat->setPlaceholderText("Powtórz hasło");
-    password_repeat->setEchoMode(QLineEdit::Password);
+    register_password_repeat = new QLineEdit;
+    register_password_repeat->setPlaceholderText("Powtórz hasło");
+    register_password_repeat->setEchoMode(QLineEdit::Password);
 
-    QLineEdit* pesel = new QLineEdit;
-    pesel->setPlaceholderText("PESEL");
+    register_pesel = new QLineEdit;
+    register_pesel->setPlaceholderText("PESEL");
 
-    QLineEdit* name = new QLineEdit;
-    name->setPlaceholderText("Imię");
+    register_name = new QLineEdit;
+    register_name->setPlaceholderText("Imię");
 
-    QLineEdit* surname = new QLineEdit;
-    surname->setPlaceholderText("Nazwisko");
+    register_surname = new QLineEdit;
+    register_surname->setPlaceholderText("Nazwisko");
 
-    QLineEdit* city = new QLineEdit;
-    city->setPlaceholderText("Miasto");
+    register_email = new QLineEdit;
+    register_email->setPlaceholderText("Adres E-mail");
 
-    QLineEdit* zip_code = new QLineEdit;
-    zip_code->setPlaceholderText("Kod pocztowy");
+    register_city = new QLineEdit;
+    register_city->setPlaceholderText("Miasto");
 
-    QLineEdit* street = new QLineEdit;
-    street->setPlaceholderText("Ulica");
+    register_post_code = new QLineEdit;
+    register_post_code->setPlaceholderText("Kod pocztowy");
 
-    QLineEdit* house_nr = new QLineEdit;
-    house_nr->setPlaceholderText("Numer domu");
+    register_street = new QLineEdit;
+    register_street->setPlaceholderText("Ulica");
 
-    QLineEdit* flat_nr = new QLineEdit;
-    flat_nr->setPlaceholderText("Numer mieszkania");
+    register_house_nr = new QSpinBox;
+    register_house_nr->setMinimum(0);
+    register_house_nr->setSingleStep(1);
+
+    register_flat_nr = new QLineEdit;
+    register_flat_nr->setPlaceholderText("Numer mieszkania");
 
     QFormLayout* form = new QFormLayout;
-    form->addRow(tr("&Login"), login);
-    form->addRow(tr("&Hasło"), password);
-    form->addRow(tr("&Powtórz hasło"), password_repeat);
-    form->addRow(tr("&PESEL"), pesel);
-    form->addRow(tr("&Imię"), name);
-    form->addRow(tr("&Nazwisko"), surname);
-    form->addRow(tr("&Miasto"), city);
-    form->addRow(tr("&Kod pocztowy"), zip_code);
-    form->addRow(tr("&Ulica"), street);
-    form->addRow(tr("&Numer domu"), house_nr);
-    form->addRow(tr("&Numer mieszkania"), flat_nr);
+    form->addRow(tr("&Login"), register_login);
+    form->addRow(tr("&Hasło"), register_password);
+    form->addRow(tr("&Powtórz hasło"), register_password_repeat);
+    form->addRow(tr("&PESEL"), register_pesel);
+    form->addRow(tr("&Imię"), register_name);
+    form->addRow(tr("&Nazwisko"), register_surname);
+    form->addRow(tr("&E-mail"), register_email);
 
-    form->setVerticalSpacing(10);
+    QFormLayout* address = new QFormLayout;
+    address->addRow(tr("&Miasto"), register_city);
+    address->addRow(tr("&Kod pocztowy"), register_post_code);
+    address->addRow(tr("&Ulica"), register_street);
+    address->addRow(tr("&Numer domu"), register_house_nr);
+    address->addRow(tr("&Numer mieszkania"), register_flat_nr);
+
+    QHBoxLayout* forms_layout = new QHBoxLayout;
+    forms_layout->addLayout(form);
+    forms_layout->addLayout(address);
 
     QPushButton* register_button = new QPushButton(tr("&Zarejestruj się"));
+    connect(register_button, SIGNAL(released()), this, SLOT(registerClientSlot()));
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->addLayout(form);
+    layout->addLayout(forms_layout);
     layout->addWidget(register_button);
     layout->setAlignment(Qt::AlignTop);
 
@@ -190,4 +200,10 @@ void MainWindow::create_actions()
 
     registerAsClient = new QAction(tr("&Konto klienta"), this);
     connect(registerAsClient, &QAction::triggered, this, &MainWindow::registerAsClientSlot);
+}
+
+void MainWindow::registerClientSlot()
+{
+    qDebug() << register_login->text();
+
 }

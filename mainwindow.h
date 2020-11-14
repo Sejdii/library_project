@@ -5,6 +5,11 @@
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QDateEdit>
+#include <QSpinBox>
+
+#include <address.h>
+#include "client.h"
+#include "user.h"
 
 class MainWindow : public QMainWindow
 {
@@ -20,6 +25,8 @@ private slots:
     void loginAsClientSlot();
     void loginAsWorkerSlot();
     void registerAsClientSlot();
+
+    void registerClientSlot();
 
 private:
     void stage_homepage();
@@ -37,5 +44,18 @@ private:
     QAction* loginAsClient;
     QAction* loginAsWorker;
     QAction* registerAsClient;
+
+    QLineEdit* register_login;
+    QLineEdit* register_password;
+    QLineEdit* register_password_repeat;
+    QLineEdit* register_pesel;
+    QLineEdit* register_name;
+    QLineEdit* register_surname;
+    QLineEdit* register_email;
+    QLineEdit* register_city;
+    QLineEdit* register_post_code;
+    QLineEdit* register_street;
+    QSpinBox* register_house_nr;
+    QLineEdit* register_flat_nr;
 };
 #endif // MAINWINDOW_H
