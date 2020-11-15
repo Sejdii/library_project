@@ -7,6 +7,8 @@
 #include <QValidator>
 #include <QRegularExpression>
 
+#include "dbmanager.h"
+
 class Client : public User
 {
 private:
@@ -20,6 +22,13 @@ public:
     Client(QString pesel, QString name, QString surname, QString email);
 
     bool validate();
+    bool login_unique();
+    bool email_unique();
+
+    void set_user(User user);
+    void set_addr(unsigned int id);
+
+    int push();
 };
 
 #endif // CLIENT_H

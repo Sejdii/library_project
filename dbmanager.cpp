@@ -147,3 +147,8 @@ bool DBManager::initial_database(const QString& path, bool force)
 
     return true;
 }
+
+QSqlDatabase DBManager::get_database()
+{
+    return this->database;
+}

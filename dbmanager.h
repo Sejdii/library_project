@@ -12,6 +12,8 @@ public:
     DBManager(const QString& path);
     static bool initial_database(const QString& path, bool force=false);
 
+    QSqlDatabase get_database();
+
 private:
     QSqlDatabase database;
 };

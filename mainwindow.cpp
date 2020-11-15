@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     DBManager::initial_database(DATABASE_PATH);
+    DBManager database(DATABASE_PATH);
     this->setWindow();
     this->setStage("homepage");
 }
@@ -130,8 +131,9 @@ void MainWindow::stage_register_client()
     register_house_nr->setMinimum(0);
     register_house_nr->setSingleStep(1);
 
-    register_flat_nr = new QLineEdit;
-    register_flat_nr->setPlaceholderText("Numer mieszkania");
+    register_flat_nr = new QSpinBox;
+    register_flat_nr->setMinimum(0);
+    register_flat_nr->setSingleStep(1);
 
     QFormLayout* form = new QFormLayout;
     form->addRow(tr("&Login"), register_login);
@@ -147,7 +149,7 @@ void MainWindow::stage_register_client()
     address->addRow(tr("&Kod pocztowy"), register_post_code);
     address->addRow(tr("&Ulica"), register_street);
     address->addRow(tr("&Numer domu"), register_house_nr);
-    address->addRow(tr("&Numer mieszkania"), register_flat_nr);
+    address->addRow(tr("&Numer mieszkania (pozostaw 0 jeżeli nie posiadasz)"), register_flat_nr);
 
     QHBoxLayout* forms_layout = new QHBoxLayout;
     forms_layout->addLayout(form);
@@ -204,6 +206,24 @@ void MainWindow::create_actions()
 
 void MainWindow::registerClientSlot()
 {
-    qDebug() << register_login->text();
 
+    User user_data(register_login->text(), register_password->text());
+    Client new_client(register_pesel->text(), register_name->text(), register_surname->text(), register_email->text());
+    new_client.set_user(user_data);
+    Address address_data(register_city->text(), register_post_code->text(), register_street->text(), register_house_nr->value(), register_flat_nr->value());
+    if(user_data.validate()) {
+        if(new_client.validate()) {
+            if(address_data.validate()) {
+                if(user_data.compare_passwords(register_password_repeat->text(), true)) {
+                    // VALIDATION SUCCESS
+                    if(address_data.push() >= 0) {
+                        new_client.set_addr(address_data.getID());
+                        if(new_client.push() >= 0) {
+                            MainWindow::setStage("login_client");
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

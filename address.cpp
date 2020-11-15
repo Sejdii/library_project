@@ -26,7 +26,7 @@ bool Address::validate()
     exp.setPattern("[0-9]{2}[-]+[0-9]{3}");
     validator.setRegularExpression(exp);
 
-    if(validator.validate(post_code, pos) == QValidator::Invalid) {
+    if(validator.validate(post_code, pos) == QValidator::Invalid || post_code.isEmpty()) {
         error = "Kod pocztowy jest nieprawidłowy";
         flag = false;
     }
@@ -36,10 +36,42 @@ bool Address::validate()
         flag = false;
     }
 
+    if(home_nr == 0) {
+        error = "Numer domu jest nie prawidłowy";
+        flag = false;
+    }
+
     if(!flag) {
         QMessageBox hint;
         hint.warning(nullptr, "Nieprawidłowe dane", error);
     }
 
     return flag;
+}
+
+int Address::push()
+{
+    QSqlQuery query;
+
+    bool flag = query.prepare("INSERT INTO address VALUES(NULL, ?, ?, ?, ?, ?);");
+    if(!flag) qDebug() << "prepare error" << query.lastError();
+    query.addBindValue(city);
+    query.addBindValue(post_code);
+    query.addBindValue(street);
+    query.addBindValue(home_nr);
+    query.addBindValue(flat_nr);
+
+    if(!query.exec()) {
+        qDebug() << "INSERT INTO address table error:" << query.lastError();
+        return -1;
+    }
+
+    id = query.lastInsertId().toInt();
+
+    return id;
+}
+
+int Address::getID()
+{
+    return this->id;
 }

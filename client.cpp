@@ -17,7 +17,7 @@ bool Client::validate()
     QRegularExpressionValidator validator(exp);
     int pos = 0;
 
-    if(validator.validate(pesel, pos) == QValidator::Invalid) {
+    if(validator.validate(pesel, pos) == QValidator::Invalid || pesel.length() == 0) {
         error = "Podany pesel jest nieprawidłowy";
         flag = false;
     }
@@ -38,8 +38,18 @@ bool Client::validate()
     exp.setPattern("^\\S+@\\S+\\.\\S+");
     validator.setRegularExpression(exp);
 
-    if(validator.validate(email, pos) == QValidator::Invalid) {
+    if(validator.validate(email, pos) == QValidator::Invalid || email.length() == 0) {
         error = "Podany adres e-mail jest nieprawidłowy";
+        flag = false;
+    }
+
+    if(!login_unique()) {
+        error = "Podany login jest już zajęty. Użyj innego";
+        flag = false;
+    }
+
+    if(!email_unique()) {
+        error = "Podany e-mail jest już w użyciu.";
         flag = false;
     }
 
@@ -49,4 +59,74 @@ bool Client::validate()
     }
 
     return flag;
+}
+
+void Client::set_user(User user)
+{
+    this->login = user.getLogin();
+    this->password = user.getPassword();
+}
+
+int Client::push()
+{
+    QSqlQuery query;
+
+    if(!query.prepare("INSERT INTO client VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);")) {
+        qDebug() << query.lastError();
+    }
+    query.addBindValue(login);
+    query.addBindValue(password);
+    query.addBindValue(pesel);
+    query.addBindValue(name);
+    query.addBindValue(surname);
+    query.addBindValue(email);
+    query.addBindValue(address_id);
+
+    if(!query.exec()) {
+        qDebug() << "INSERT INTO client table error:" << query.lastError();
+        return -1;
+    }
+
+    id = query.lastInsertId().toInt();
+
+    return id;
+}
+
+void Client::set_addr(unsigned int id)
+{
+    address_id = id;
+}
+
+bool Client::login_unique()
+{
+    QSqlQuery query;
+
+    if(!query.prepare("SELECT id FROM client WHERE login = ?")) {
+        qDebug() << query.lastError();
+    }
+    query.addBindValue(login);
+    if(!query.exec()) {
+        qDebug() << "Login unique error:" << query.lastError();
+        return false;
+    }
+
+    if(query.first()) return false;
+    return true;
+}
+
+bool Client::email_unique()
+{
+    QSqlQuery query;
+
+    if(!query.prepare("SELECT id FROM client WHERE email = ?")) {
+        qDebug() << query.lastError();
+    }
+    query.addBindValue(email);
+    if(!query.exec()) {
+        qDebug() << "Email unique error:" << query.lastError();
+        return false;
+    }
+
+    if(query.first()) return false;
+    return true;
 }

@@ -6,6 +6,7 @@
 #include <QFormLayout>
 #include <QDateEdit>
 #include <QSpinBox>
+#include <QShortcut>
 
 #include <address.h>
 #include "client.h"
@@ -56,6 +57,6 @@ private:
     QLineEdit* register_post_code;
     QLineEdit* register_street;
     QSpinBox* register_house_nr;
-    QLineEdit* register_flat_nr;
+    QSpinBox* register_flat_nr;
 };
 #endif // MAINWINDOW_H
