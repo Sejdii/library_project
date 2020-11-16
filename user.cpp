@@ -64,3 +64,26 @@ void User::password_hash()
 {
     password = QCryptographicHash::hash(password.toLocal8Bit(), QCryptographicHash::Sha3_512);
 }
+
+bool User::verify(int account_type)
+{
+    QSqlQuery query;
+    QString type = "client";
+    if(account_type == ACCOUNT_CLIENT) type = "client";
+    else if(account_type == ACCOUNT_WORKER) type = "worker";
+    if(!query.prepare(QString("SELECT id FROM %1 WHERE login = ? AND password = ?").arg(type))) qDebug() << query.lastError();
+    query.addBindValue(login);
+    query.addBindValue(password);
+    if(!query.exec()) {
+        qDebug() << "Login verify error:" << query.lastError();
+        return false;
+    }
+    if(query.first()) return true;
+    else {
+        QMessageBox hint;
+        hint.warning(nullptr, "Nieprawidłowe dane logowania", "Nieprawidłowy login lub hasło. Spróbuj ponownie.");
+        return false;
+    }
+
+    return false;
+}

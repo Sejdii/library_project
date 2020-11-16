@@ -28,11 +28,14 @@ private slots:
     void registerAsClientSlot();
 
     void registerClientSlot();
+    void loginClientSlot();
+    void loginWorkerSlot();
 
 private:
     void stage_homepage();
     void stage_login_client();
     void stage_register_client();
+    void stage_login_worker();
 
     void create_menu();
     void create_actions();
@@ -58,5 +61,8 @@ private:
     QLineEdit* register_street;
     QSpinBox* register_house_nr;
     QSpinBox* register_flat_nr;
+
+    QLineEdit* login_login;
+    QLineEdit* login_password;
 };
 #endif // MAINWINDOW_H

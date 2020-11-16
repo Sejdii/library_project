@@ -29,6 +29,9 @@ void MainWindow::setStage(QString stage)
     if(stage == "login_client") {
         this->stage_login_client();
     }
+    if(stage == "login_worker") {
+        this->stage_login_worker();
+    }
     if(stage == "register_client") {
         this->stage_register_client();
     }
@@ -68,18 +71,19 @@ void MainWindow::stage_login_client()
 
     QLabel* login_text = new QLabel(tr("<h1>Zaloguj się jako klient</h1>"));
 
-    QLineEdit* login = new QLineEdit;
-    login->setPlaceholderText("Login");
+    login_login = new QLineEdit;
+    login_login->setPlaceholderText("Login");
 
-    QLineEdit* password = new QLineEdit;
-    password->setPlaceholderText("Hasło");
-    password->setEchoMode(QLineEdit::Password);
+    login_password = new QLineEdit;
+    login_password->setPlaceholderText("Hasło");
+    login_password->setEchoMode(QLineEdit::Password);
 
     QFormLayout* form = new QFormLayout;
-    form->addRow(tr("&Login"), login);
-    form->addRow(tr("&Hasło"), password);
+    form->addRow(tr("&Login"), login_login);
+    form->addRow(tr("&Hasło"), login_password);
 
     QPushButton* login_button = new QPushButton(tr("&Zaloguj się"));
+    connect(login_button, SIGNAL(released()), this, SLOT(loginClientSlot()));
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(login_text);
@@ -184,7 +188,7 @@ void MainWindow::loginAsClientSlot()
 
 void MainWindow::loginAsWorkerSlot()
 {
-    qDebug() << "loginAsWorker";
+    MainWindow::setStage("login_worker");
 }
 
 void MainWindow::registerAsClientSlot()
@@ -225,5 +229,53 @@ void MainWindow::registerClientSlot()
                 }
             }
         }
+    }
+}
+
+void MainWindow::loginClientSlot()
+{
+    User user_data(login_login->text(), login_password->text());
+    user_data.password_hash();
+    if(user_data.verify(ACCOUNT_CLIENT)) {
+        qDebug() << "Zalogowano pomyślnie";
+    }
+}
+
+void MainWindow::stage_login_worker()
+{
+    setWindowTitle("Zaloguj się");
+
+    QLabel* login_text = new QLabel(tr("<h1>Zaloguj się jako pracownik</h1>"));
+
+    login_login = new QLineEdit;
+    login_login->setPlaceholderText("Login");
+
+    login_password = new QLineEdit;
+    login_password->setPlaceholderText("Hasło");
+    login_password->setEchoMode(QLineEdit::Password);
+
+    QFormLayout* form = new QFormLayout;
+    form->addRow(tr("&Login"), login_login);
+    form->addRow(tr("&Hasło"), login_password);
+
+    QPushButton* login_button = new QPushButton(tr("&Zaloguj się"));
+    connect(login_button, SIGNAL(released()), this, SLOT(loginWorkerSlot()));
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(login_text);
+    layout->addLayout(form);
+    layout->addWidget(login_button);
+    layout->setAlignment(Qt::AlignTop);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void MainWindow::loginWorkerSlot()
+{
+    User user_data(login_login->text(), login_password->text());
+    user_data.password_hash();
+    if(user_data.verify(ACCOUNT_WORKER)) {
+        qDebug() << "Zalogowano pomyślnie";
     }
 }

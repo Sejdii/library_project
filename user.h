@@ -5,6 +5,10 @@
 #include <QValidator>
 #include <QMessageBox>
 #include <QCryptographicHash>
+#include <QtSql>
+
+const int ACCOUNT_CLIENT = 0;
+const int ACCOUNT_WORKER = 1;
 
 class User
 {
@@ -18,6 +22,7 @@ public:
 
     bool validate();
     bool compare_passwords(QString password, bool hint=false);
+    bool verify(int account_type);
 
     void password_hash();
 
