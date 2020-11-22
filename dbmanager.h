@@ -4,6 +4,8 @@
 #include <QString>
 #include <QtSql>
 
+#include "worker.h"
+
 const QString DATABASE_PATH = "library.db";
 
 class DBManager

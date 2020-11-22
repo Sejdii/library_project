@@ -43,7 +43,7 @@ bool Client::validate()
         flag = false;
     }
 
-    if(!login_unique()) {
+    if(!login_unique(ACCOUNT_CLIENT)) {
         error = "Podany login jest już zajęty. Użyj innego";
         flag = false;
     }
@@ -95,23 +95,6 @@ int Client::push()
 void Client::set_addr(unsigned int id)
 {
     address_id = id;
-}
-
-bool Client::login_unique()
-{
-    QSqlQuery query;
-
-    if(!query.prepare("SELECT id FROM client WHERE login = ?")) {
-        qDebug() << query.lastError();
-    }
-    query.addBindValue(login);
-    if(!query.exec()) {
-        qDebug() << "Login unique error:" << query.lastError();
-        return false;
-    }
-
-    if(query.first()) return false;
-    return true;
 }
 
 bool Client::email_unique()

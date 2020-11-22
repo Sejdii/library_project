@@ -23,11 +23,14 @@ public:
     bool validate();
     bool compare_passwords(QString password, bool hint=false);
     bool verify(int account_type);
+    bool login_unique(int account_type);
 
     void password_hash();
+    void set_user(User user);
 
     QString getLogin();
     QString getPassword();
+    unsigned int getID();
 };
 
 #endif // USER_H

@@ -92,7 +92,7 @@ bool DBManager::initial_database(const QString& path, bool force)
     // CREATING WORKER TABLE
     value = "CREATE TABLE worker("
                   "id integer NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                  "pesel varchar(11) NOT NULL UNIQUE,"
+                  "type boolean NOT NULL,"
                   "login varchar(16) NOT NULL UNIQUE,"
                   "password varchar(255) NOT NULL,"
                   "name varchar(64) NOT NULL,"
@@ -144,8 +144,13 @@ bool DBManager::initial_database(const QString& path, bool force)
        return false;
    }
 
+   //MAKING ROOT ACCOUNT login: root, password: qwerty1234
+   Worker worker(1, "root", "root");
+   worker.set_user(User("root", "qwerty1234"));
+   worker.password_hash();
+   worker.push();
 
-    return true;
+   return true;
 }
 
 QSqlDatabase DBManager::get_database()

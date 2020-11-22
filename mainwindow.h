@@ -11,6 +11,8 @@
 #include <address.h>
 #include "client.h"
 #include "user.h"
+#include "clientwindow.h"
+#include "workerwindow.h"
 
 class MainWindow : public QMainWindow
 {

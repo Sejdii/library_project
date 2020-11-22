@@ -78,7 +78,10 @@ bool User::verify(int account_type)
         qDebug() << "Login verify error:" << query.lastError();
         return false;
     }
-    if(query.first()) return true;
+    if(query.first()) {
+        id = query.value(0).toInt();
+        return true;
+    }
     else {
         QMessageBox hint;
         hint.warning(nullptr, "Nieprawidłowe dane logowania", "Nieprawidłowy login lub hasło. Spróbuj ponownie.");
@@ -86,4 +89,36 @@ bool User::verify(int account_type)
     }
 
     return false;
+}
+
+bool User::login_unique(int account_type)
+{
+    QSqlQuery query;
+
+    QString type = "client";
+    if(account_type == ACCOUNT_CLIENT) type = "client";
+    else if(account_type == ACCOUNT_WORKER) type = "worker";
+
+    if(!query.prepare(QString("SELECT id FROM %1 WHERE login = ?").arg(type))) {
+        qDebug() << query.lastError();
+    }
+    query.addBindValue(login);
+    if(!query.exec()) {
+        qDebug() << "Login unique error:" << query.lastError();
+        return false;
+    }
+
+    if(query.first()) return false;
+    return true;
+}
+
+void User::set_user(User user)
+{
+    this->login = user.getLogin();
+    this->password = user.getPassword();
+}
+
+unsigned int User::getID()
+{
+    return id;
 }

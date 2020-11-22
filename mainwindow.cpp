@@ -222,6 +222,7 @@ void MainWindow::registerClientSlot()
                     // VALIDATION SUCCESS
                     if(address_data.push() >= 0) {
                         new_client.set_addr(address_data.getID());
+                        new_client.password_hash();
                         if(new_client.push() >= 0) {
                             MainWindow::setStage("login_client");
                         }
@@ -237,7 +238,8 @@ void MainWindow::loginClientSlot()
     User user_data(login_login->text(), login_password->text());
     user_data.password_hash();
     if(user_data.verify(ACCOUNT_CLIENT)) {
-        qDebug() << "Zalogowano pomyślnie";
+        ClientWindow* cwindow = new ClientWindow;
+        cwindow->show();
     }
 }
 
@@ -273,9 +275,13 @@ void MainWindow::stage_login_worker()
 
 void MainWindow::loginWorkerSlot()
 {
-    User user_data(login_login->text(), login_password->text());
-    user_data.password_hash();
-    if(user_data.verify(ACCOUNT_WORKER)) {
-        qDebug() << "Zalogowano pomyślnie";
+    Worker worker(User(login_login->text(), login_password->text()));
+    worker.password_hash();
+    if(worker.verify(ACCOUNT_WORKER)) {
+        worker.fetch_worker_data();
+
+        WorkerWindow* workerwindow = new WorkerWindow;
+        workerwindow->set_worker(worker.getID());
+        workerwindow->show();
     }
 }
