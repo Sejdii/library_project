@@ -1,14 +1,13 @@
 #include "workerwindow.h"
 
-WorkerWindow::WorkerWindow(QWidget *parent) : QMainWindow(parent)
+WorkerWindow::WorkerWindow(unsigned int id, QWidget *parent) : QMainWindow(parent)
 {
     setWindow();
     widget = new QWidget;
     setCentralWidget(widget);
-    create_menu();
-    qDebug() << worker->getName();
+    set_worker(id);
 
-    //setStage("homepage");
+    setStage("homepage");
 }
 
 void WorkerWindow::setWindow()
@@ -16,29 +15,42 @@ void WorkerWindow::setWindow()
     setMinimumSize(500, 400);
     resize(800, 600);
     setWindowTitle("Witaj pracowniku");
+
+    create_actions();
+    create_menu();
 }
 
 void WorkerWindow::create_menu()
 {
-    workersMenu = menuBar()->addMenu(tr("&Zaloguj się"));
+    workersMenu = menuBar()->addMenu(tr("&Pracownicy"));
+    workersMenu->addAction(addWorker);
+    workersMenu->addAction(scroolWorker);
 }
 
 void WorkerWindow::create_actions()
 {
+    addWorker = new QAction(tr("&Dodaj pracownika"), this);
+    connect(addWorker, &QAction::triggered, this, &WorkerWindow::addWorkerSlot);
 
+    scroolWorker = new QAction(tr("&Przeglądaj pracowników"), this);
+    connect(scroolWorker, &QAction::triggered, this, &WorkerWindow::scrollWorkerSlot);
 }
 
 void WorkerWindow::set_worker(unsigned int id)
 {
-    qDebug() << id;
     worker = new Worker(id);
     worker->fetch_worker_data();
+    w_type = worker->getType();
 }
 
 void WorkerWindow::setStage(QString stage)
 {
     if(stage == "homepage") {
         stage_homepage();
+    }
+
+    if(stage == "addworker") {
+        stage_addworker();
     }
 }
 
@@ -48,7 +60,17 @@ void WorkerWindow::setStage(QString stage)
 
 void WorkerWindow::addWorkerSlot()
 {
-    qDebug() << "addWorkerSlot";
+    setStage("addworker");
+}
+
+void WorkerWindow::scrollWorkerSlot()
+{
+    qDebug() << "scrollWorkerSlot";
+}
+
+void WorkerWindow::worker_add()
+{
+    qDebug() << "worker_add";
 }
 
 // #################################
@@ -57,10 +79,53 @@ void WorkerWindow::addWorkerSlot()
 
 void WorkerWindow::stage_homepage()
 {
-    QLabel* hello_label = new QLabel(QString("Witaj %1").arg(worker->getName()));
+    QLabel* hello_label = new QLabel(QString("<h1>Witaj <b>%1</b></h1>").arg(worker->getName()));
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(hello_label);
 
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_addworker()
+{
+    QLabel* label = new QLabel("Dodaj nowego pracownika");
+
+    register_worker_login = new QLineEdit;
+    register_worker_login->setPlaceholderText("Login pracownika");
+
+    register_worker_password = new QLineEdit;
+    register_worker_password->setEchoMode(QLineEdit::Password);
+    register_worker_password->setPlaceholderText("Hasło pracownika");
+
+    register_worker_type = new QSpinBox;
+    register_worker_type->setMinimum(0);
+    register_worker_type->setMaximum(1);
+    register_worker_type->setSingleStep(1);
+
+    register_worker_name = new QLineEdit;
+    register_worker_name->setPlaceholderText("Imię pracownika");
+
+    register_worker_surname = new QLineEdit;
+    register_worker_surname->setPlaceholderText("Nazwisko pracownika");
+
+    QFormLayout* form = new QFormLayout;
+    form->addRow(tr("&Login"), register_worker_login);
+    form->addRow(tr("&Hasło"), register_worker_password);
+    form->addRow(tr("&Typ użytkownika (0 - zwykły, 1 - administrator)"), register_worker_type);
+    form->addRow(tr("&Imię"), register_worker_name);
+    form->addRow(tr("&Nazwisko"), register_worker_surname);
+
+    QPushButton* register_button = new QPushButton(tr("&Dodaj użytkownika"));
+    connect(register_button, SIGNAL(released()), this, SLOT(worker_add()));
+
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(label);
+    layout->addLayout(form);
+    layout->addWidget(register_button);
+    layout->setAlignment(Qt::AlignTop);
+
+    qDeleteAll(widget->children());
     widget->setLayout(layout);
 }

@@ -37,6 +37,129 @@ void MainWindow::setStage(QString stage)
     }
 }
 
+void MainWindow::create_menu()
+{
+    loginMenu = menuBar()->addMenu(tr("&Zaloguj się"));
+    loginMenu->addAction(loginAsClient);
+    loginMenu->addAction(loginAsWorker);
+
+    registerMenu = menuBar()->addMenu(tr("&Zarejestruj"));
+    registerMenu->addAction(registerAsClient);
+}
+
+void MainWindow::create_actions()
+{
+    loginAsClient = new QAction(tr("&Jako klient"), this);
+    connect(loginAsClient, &QAction::triggered, this, &MainWindow::loginAsClientSlot);
+
+    loginAsWorker = new QAction(tr("&Jako pracownik"), this);
+    connect(loginAsWorker, &QAction::triggered, this, &MainWindow::loginAsWorkerSlot);
+
+    registerAsClient = new QAction(tr("&Konto klienta"), this);
+    connect(registerAsClient, &QAction::triggered, this, &MainWindow::registerAsClientSlot);
+}
+
+// #################################
+// #             SLOTS             #
+// #################################
+
+void MainWindow::registerClientSlot()
+{
+
+    User user_data(register_login->text(), register_password->text());
+    Client new_client(register_pesel->text(), register_name->text(), register_surname->text(), register_email->text());
+    new_client.set_user(user_data);
+    Address address_data(register_city->text(), register_post_code->text(), register_street->text(), register_house_nr->value(), register_flat_nr->value());
+    if(user_data.validate()) {
+        if(new_client.validate()) {
+            if(address_data.validate()) {
+                if(user_data.compare_passwords(register_password_repeat->text(), true)) {
+                    // VALIDATION SUCCESS
+                    if(address_data.push() >= 0) {
+                        new_client.set_addr(address_data.getID());
+                        new_client.password_hash();
+                        if(new_client.push() >= 0) {
+                            MainWindow::setStage("login_client");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::loginClientSlot()
+{
+    User user_data(login_login->text(), login_password->text());
+    user_data.password_hash();
+    if(user_data.verify(ACCOUNT_CLIENT)) {
+        ClientWindow* cwindow = new ClientWindow;
+        cwindow->show();
+    }
+}
+
+void MainWindow::loginAsClientSlot()
+{
+    MainWindow::setStage("login_client");
+}
+
+void MainWindow::loginAsWorkerSlot()
+{
+    MainWindow::setStage("login_worker");
+}
+
+void MainWindow::registerAsClientSlot()
+{
+    MainWindow::setStage("register_client");
+}
+
+void MainWindow::loginWorkerSlot()
+{
+    Worker worker(User(login_login->text(), login_password->text()));
+    worker.password_hash();
+    if(worker.verify(ACCOUNT_WORKER)) {
+        //worker.fetch_worker_data();
+
+        WorkerWindow* workerwindow = new WorkerWindow(worker.getID()); // CREATING NEW WINDOW - WORKER WINDOW
+        workerwindow->show();
+        close();
+    }
+}
+
+// #################################
+// #            STAGES             #
+// #################################
+
+void MainWindow::stage_login_worker()
+{
+    setWindowTitle("Zaloguj się");
+
+    QLabel* login_text = new QLabel(tr("<h1>Zaloguj się jako pracownik</h1>"));
+
+    login_login = new QLineEdit;
+    login_login->setPlaceholderText("Login");
+
+    login_password = new QLineEdit;
+    login_password->setPlaceholderText("Hasło");
+    login_password->setEchoMode(QLineEdit::Password);
+
+    QFormLayout* form = new QFormLayout;
+    form->addRow(tr("&Login"), login_login);
+    form->addRow(tr("&Hasło"), login_password);
+
+    QPushButton* login_button = new QPushButton(tr("&Zaloguj się"));
+    connect(login_button, SIGNAL(released()), this, SLOT(loginWorkerSlot()));
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(login_text);
+    layout->addLayout(form);
+    layout->addWidget(login_button);
+    layout->setAlignment(Qt::AlignTop);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
 void MainWindow::stage_homepage()
 {
     widget = new QWidget;
@@ -169,119 +292,4 @@ void MainWindow::stage_register_client()
 
     qDeleteAll(widget->children());
     widget->setLayout(layout);
-}
-
-void MainWindow::create_menu()
-{
-    loginMenu = menuBar()->addMenu(tr("&Zaloguj się"));
-    loginMenu->addAction(loginAsClient);
-    loginMenu->addAction(loginAsWorker);
-
-    registerMenu = menuBar()->addMenu(tr("&Zarejestruj"));
-    registerMenu->addAction(registerAsClient);
-}
-
-void MainWindow::loginAsClientSlot()
-{
-    MainWindow::setStage("login_client");
-}
-
-void MainWindow::loginAsWorkerSlot()
-{
-    MainWindow::setStage("login_worker");
-}
-
-void MainWindow::registerAsClientSlot()
-{
-    MainWindow::setStage("register_client");
-}
-
-void MainWindow::create_actions()
-{
-    loginAsClient = new QAction(tr("&Jako klient"), this);
-    connect(loginAsClient, &QAction::triggered, this, &MainWindow::loginAsClientSlot);
-
-    loginAsWorker = new QAction(tr("&Jako pracownik"), this);
-    connect(loginAsWorker, &QAction::triggered, this, &MainWindow::loginAsWorkerSlot);
-
-    registerAsClient = new QAction(tr("&Konto klienta"), this);
-    connect(registerAsClient, &QAction::triggered, this, &MainWindow::registerAsClientSlot);
-}
-
-void MainWindow::registerClientSlot()
-{
-
-    User user_data(register_login->text(), register_password->text());
-    Client new_client(register_pesel->text(), register_name->text(), register_surname->text(), register_email->text());
-    new_client.set_user(user_data);
-    Address address_data(register_city->text(), register_post_code->text(), register_street->text(), register_house_nr->value(), register_flat_nr->value());
-    if(user_data.validate()) {
-        if(new_client.validate()) {
-            if(address_data.validate()) {
-                if(user_data.compare_passwords(register_password_repeat->text(), true)) {
-                    // VALIDATION SUCCESS
-                    if(address_data.push() >= 0) {
-                        new_client.set_addr(address_data.getID());
-                        new_client.password_hash();
-                        if(new_client.push() >= 0) {
-                            MainWindow::setStage("login_client");
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void MainWindow::loginClientSlot()
-{
-    User user_data(login_login->text(), login_password->text());
-    user_data.password_hash();
-    if(user_data.verify(ACCOUNT_CLIENT)) {
-        ClientWindow* cwindow = new ClientWindow;
-        cwindow->show();
-    }
-}
-
-void MainWindow::stage_login_worker()
-{
-    setWindowTitle("Zaloguj się");
-
-    QLabel* login_text = new QLabel(tr("<h1>Zaloguj się jako pracownik</h1>"));
-
-    login_login = new QLineEdit;
-    login_login->setPlaceholderText("Login");
-
-    login_password = new QLineEdit;
-    login_password->setPlaceholderText("Hasło");
-    login_password->setEchoMode(QLineEdit::Password);
-
-    QFormLayout* form = new QFormLayout;
-    form->addRow(tr("&Login"), login_login);
-    form->addRow(tr("&Hasło"), login_password);
-
-    QPushButton* login_button = new QPushButton(tr("&Zaloguj się"));
-    connect(login_button, SIGNAL(released()), this, SLOT(loginWorkerSlot()));
-
-    QVBoxLayout* layout = new QVBoxLayout;
-    layout->addWidget(login_text);
-    layout->addLayout(form);
-    layout->addWidget(login_button);
-    layout->setAlignment(Qt::AlignTop);
-
-    qDeleteAll(widget->children());
-    widget->setLayout(layout);
-}
-
-void MainWindow::loginWorkerSlot()
-{
-    Worker worker(User(login_login->text(), login_password->text()));
-    worker.password_hash();
-    if(worker.verify(ACCOUNT_WORKER)) {
-        worker.fetch_worker_data();
-
-        WorkerWindow* workerwindow = new WorkerWindow;
-        workerwindow->set_worker(worker.getID());
-        workerwindow->show();
-    }
 }

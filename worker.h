@@ -26,6 +26,7 @@ public:
     QString getName();
 
     int push();
+    int getType();
 };
 
 #endif // WORKER_H

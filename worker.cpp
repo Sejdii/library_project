@@ -76,3 +76,8 @@ QString Worker::getName()
 {
     return name;
 }
+
+int Worker::getType()
+{
+    return type;
+}
