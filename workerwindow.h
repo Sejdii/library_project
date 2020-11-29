@@ -39,6 +39,7 @@ private:
 
     QLineEdit* register_worker_login;
     QLineEdit* register_worker_password;
+    QLineEdit* register_worker_password_repeat;
     QLineEdit* register_worker_name;
     QLineEdit* register_worker_surname;
 

@@ -70,7 +70,21 @@ void WorkerWindow::scrollWorkerSlot()
 
 void WorkerWindow::worker_add()
 {
-    qDebug() << "worker_add";
+    User new_user(register_worker_login->text(), register_worker_password->text());
+    Worker new_worker(register_worker_type->value() ,register_worker_name->text(), register_worker_surname->text());
+    new_worker.set_user(new_user);
+
+    if(new_user.validate()) {
+        if(new_worker.validate()) {
+            if(new_user.compare_passwords(register_worker_password_repeat->text(), true)) {
+                // VALIDATION SUCCESS
+                new_worker.password_hash();
+                if(new_worker.push() >= 0) {
+                    setStage("home");
+                }
+            }
+        }
+    }
 }
 
 // #################################
@@ -98,6 +112,10 @@ void WorkerWindow::stage_addworker()
     register_worker_password->setEchoMode(QLineEdit::Password);
     register_worker_password->setPlaceholderText("Hasło pracownika");
 
+    register_worker_password_repeat = new QLineEdit;
+    register_worker_password_repeat->setEchoMode(QLineEdit::Password);
+    register_worker_password_repeat->setPlaceholderText("Powtórz hasło pracownika");
+
     register_worker_type = new QSpinBox;
     register_worker_type->setMinimum(0);
     register_worker_type->setMaximum(1);
@@ -112,6 +130,7 @@ void WorkerWindow::stage_addworker()
     QFormLayout* form = new QFormLayout;
     form->addRow(tr("&Login"), register_worker_login);
     form->addRow(tr("&Hasło"), register_worker_password);
+    form->addRow(tr("&Powtórz hasło"), register_worker_password_repeat);
     form->addRow(tr("&Typ użytkownika (0 - zwykły, 1 - administrator)"), register_worker_type);
     form->addRow(tr("&Imię"), register_worker_name);
     form->addRow(tr("&Nazwisko"), register_worker_surname);

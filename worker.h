@@ -19,6 +19,8 @@ public:
     Worker(int type, QString name, QString surname);
     Worker(unsigned int id);
 
+    bool validate();
+
     void set_user(User user);
     void set_id(unsigned int id);
     void fetch_worker_data();

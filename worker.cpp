@@ -81,3 +81,40 @@ int Worker::getType()
 {
     return type;
 }
+
+bool Worker::validate()
+{
+    bool flag = true;
+    QString error;
+
+    QRegularExpression exp("^[\\w'\\-,.]*[^_!¡?÷?¿\\/\\\\+=@#$%ˆ&*(){}|~<>;:[\\]]*");
+    QRegularExpressionValidator validator(exp);
+    int pos = 0;
+
+    if(validator.validate(name, pos) == QValidator::Invalid || name.isEmpty()) {
+        error = "Podane imię jest nieprawidłowe";
+        flag = false;
+    }
+
+    if(validator.validate(surname, pos) == QValidator::Invalid || surname.isEmpty()) {
+        error = "Podane nazwisko jest nieprawidłowe";
+        flag = false;
+    }
+
+    if(!login_unique(ACCOUNT_WORKER)) {
+        error = "Podany login jest już zajęty. Użyj innego";
+        flag = false;
+    }
+
+    if(type != 0 && type != 1) {
+        error = "Podany typ użytkownika jest niepoprawny";
+        flag = false;
+    }
+
+    if(!flag) {
+        QMessageBox hint;
+        hint.warning(nullptr, "Nieprawidłowe dane", error);
+    }
+
+    return flag;
+}
