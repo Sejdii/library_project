@@ -11,6 +11,7 @@
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QTableView>
 
 #include "worker.h"
 
@@ -26,24 +27,47 @@ public:
     void set_worker(unsigned int id);
     void setStage(QString stage);
 
+    QHBoxLayout* getSearchBox();
+
     void stage_homepage();
     void stage_addworker();
+    void stage_scrollworker();
+
+public slots:
+    void customMenuRequested(QPoint pos);
 
 private:
     QWidget* widget;
 
     QMenu* workersMenu;
+    QMenu* clientsMenu;
+    QMenu* booksMenu;
+    QMenu* authorsMenu;
+    QMenu* publisherMenu;
+    QMenu* rentsMenu;
 
     QAction* addWorker;
     QAction* scroolWorker;
+    QAction* client_scroll;
+    QAction* book_add;
+    QAction* book_scroll;
+    QAction* author_add;
+    QAction* author_scroll;
+    QAction* publisher_add;
+    QAction* publisher_scroll;
+    QAction* rent_add;
+    QAction* rent_scroll;
 
     QLineEdit* register_worker_login;
     QLineEdit* register_worker_password;
     QLineEdit* register_worker_password_repeat;
     QLineEdit* register_worker_name;
     QLineEdit* register_worker_surname;
+    QLineEdit* search_input;
 
     QSpinBox* register_worker_type;
+
+    QTableView* table;
 
     Worker* worker;
 
@@ -52,8 +76,19 @@ private:
 private slots:
     void addWorkerSlot();
     void scrollWorkerSlot();
+    void client_scrollSlot();
+    void book_addSlot();
+    void book_scrollSlot();
+    void author_addSlot();
+    void author_scrollSlot();
+    void publisher_addSlot();
+    void publisher_scrollSlot();
+    void rent_addSlot();
+    void rent_scrollSlot();
 
     void worker_add();
+
+    void search_slot();
 };
 
 #endif // WORKERWINDOW_H
