@@ -57,6 +57,8 @@ private:
     QAction* publisher_scroll;
     QAction* rent_add;
     QAction* rent_scroll;
+    QAction* action_table_menu_delete;
+    QAction* action_table_menu_save;
 
     QLineEdit* register_worker_login;
     QLineEdit* register_worker_password;
@@ -72,6 +74,8 @@ private:
     Worker* worker;
 
     int w_type;
+
+    int table_row_id;
 
 private slots:
     void addWorkerSlot();
@@ -89,6 +93,9 @@ private slots:
     void worker_add();
 
     void search_slot();
+    void delete_slot();
+    void save_slot();
+    void table_on_change();
 };
 
 #endif // WORKERWINDOW_H

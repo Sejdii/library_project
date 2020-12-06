@@ -50,6 +50,8 @@ void WorkerWindow::create_menu()
 
 void WorkerWindow::create_actions()
 {
+    // MAIN MENU
+
     addWorker = new QAction(tr("&Dodaj pracownika"), this);
     connect(addWorker, &QAction::triggered, this, &WorkerWindow::addWorkerSlot);
 
@@ -82,6 +84,14 @@ void WorkerWindow::create_actions()
 
     rent_scroll = new QAction(tr("&Przeglądaj wypożyczenia"), this);
     connect(rent_scroll, &QAction::triggered, this, &WorkerWindow::rent_scrollSlot);
+
+    // TABLE POP UP MENU
+
+    action_table_menu_delete = new QAction(tr("&Usuń rekord"), this);
+    connect(action_table_menu_delete, &QAction::triggered, this, &WorkerWindow::delete_slot);
+
+    action_table_menu_save = new QAction(tr("&Zapisz zmiany"), this);
+    connect(action_table_menu_save, &QAction::triggered, this, &WorkerWindow::save_slot);
 }
 
 void WorkerWindow::set_worker(unsigned int id)
@@ -201,12 +211,13 @@ void WorkerWindow::rent_scrollSlot()
 void WorkerWindow::customMenuRequested(QPoint pos)
 {
     QModelIndex index = table->indexAt(pos);
-    index = index.siblingAtColumn(0);
-    int row_id = index.data().toInt();
+    //index = index.siblingAtColumn(0);
+    //table_row_id = index.data().toInt();
+    table_row_id = index.row();
 
     QMenu* tab_menu = new QMenu(this);
-    tab_menu->addAction(new QAction("&Zapisz zmiany", this));
-    tab_menu->addAction(new QAction("&Usuń rekord", this));
+    tab_menu->addAction(action_table_menu_delete);
+    tab_menu->addAction(action_table_menu_save);
     tab_menu->popup(table->viewport()->mapToGlobal(pos));
 }
 
@@ -233,6 +244,58 @@ void WorkerWindow::search_slot()
         QMessageBox hint;
         hint.warning(nullptr, "Brak wyników", "Brak wyników wyszukiwania dla podanej frazy");
     }
+}
+
+void WorkerWindow::delete_slot()
+{
+    QSqlTableModel* t_model = (QSqlTableModel*)(table->model());
+    QSqlRecord t_record = t_model->record(table_row_id);
+
+    if(t_model->tableName() == "worker") {
+        if(t_record.value(0).toInt() == 1 || t_record.value(0).toUInt() == worker->getID()) {
+            QMessageBox hint;
+            hint.warning(nullptr, "Blokada dostępu" , "Nie można usunąć konta root lub swojego wlasnego konta");
+            return;
+        }
+    }
+
+    t_model->removeRow(table_row_id);
+    t_model->submitAll();
+}
+
+void WorkerWindow::save_slot()
+{
+    QSqlTableModel* t_model = (QSqlTableModel*)(table->model());
+    QSqlRecord t_record = t_model->record(table_row_id);
+    QString error_text;
+    bool ok = true;
+
+    if(t_model->tableName() == "worker") {
+        if(t_record.value(0).toInt() == 1) {
+            ok = false;
+            error_text = "Nie można modyfikować konta root";
+        }
+        User user(t_record.value(2).toString(), t_record.value(3).toString());
+        ok = ok && user.validate();
+        Worker worker(t_record.value(1).toInt(), t_record.value(4).toString(), t_record.value(5).toString());
+        ok = ok && worker.validate();
+    }
+
+    if(!ok) {
+        if(!error_text.isEmpty()) {
+            QMessageBox hint;
+            hint.warning(nullptr, "Blokada dostępu" , error_text);
+        }
+        return;
+    }
+
+    t_model->submitAll();
+}
+
+void WorkerWindow::table_on_change()
+{
+    QSqlTableModel* t_model = (QSqlTableModel*)(table->model());
+    t_model->revertAll();
 }
 
 // #################################
@@ -316,6 +379,7 @@ void WorkerWindow::stage_scrollworker()
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+    connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
     table->setSortingEnabled(true);
     table->show();
 
