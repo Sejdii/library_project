@@ -46,6 +46,10 @@ void WorkerWindow::create_menu()
     rentsMenu = menuBar()->addMenu(tr("&Wypożyczenia"));
     rentsMenu->addAction(rent_add);
     rentsMenu->addAction(rent_scroll);
+
+    accountMenu = menuBar()->addMenu(tr("&Twoje konto"));
+    accountMenu->addAction(action_menu_account_change_passwd);
+    accountMenu->addAction(action_menu_account_logout);
 }
 
 void WorkerWindow::create_actions()
@@ -85,6 +89,12 @@ void WorkerWindow::create_actions()
     rent_scroll = new QAction(tr("&Przeglądaj wypożyczenia"), this);
     connect(rent_scroll, &QAction::triggered, this, &WorkerWindow::rent_scrollSlot);
 
+    action_menu_account_change_passwd = new QAction(tr("&Zmień swoje hasło"));
+    connect(action_menu_account_change_passwd, &QAction::triggered, this, &WorkerWindow::account_changepasswdSlot);
+
+    action_menu_account_logout = new QAction(tr("&Wyloguj się"));
+    connect(action_menu_account_logout, &QAction::triggered, this, &WorkerWindow::account_logoutSlot);
+
     // TABLE POP UP MENU
 
     action_table_menu_delete = new QAction(tr("&Usuń rekord"), this);
@@ -113,6 +123,10 @@ void WorkerWindow::setStage(QString stage)
 
     if(stage == "scrollworker") {
         stage_scrollworker();
+    }
+
+    if(stage == "changepasswd") {
+        stage_changepasswd();
     }
 }
 
@@ -208,6 +222,16 @@ void WorkerWindow::rent_scrollSlot()
     qDebug() << "rent_scrollSlot";
 }
 
+void WorkerWindow::account_changepasswdSlot()
+{
+    setStage("changepasswd");
+}
+
+void WorkerWindow::account_logoutSlot()
+{
+    this->close();
+}
+
 void WorkerWindow::customMenuRequested(QPoint pos)
 {
     QModelIndex index = table->indexAt(pos);
@@ -298,6 +322,18 @@ void WorkerWindow::table_on_change()
     t_model->revertAll();
 }
 
+void WorkerWindow::account_changepasswd()
+{
+    QString old_password = register_worker_password->text();
+    QString new_password = register_worker_password_repeat->text();
+    if(worker->compare_passwords(User::password_hash(old_password), true)) {
+        if(worker->change_password(new_password, ACCOUNT_WORKER)) {
+            QMessageBox hint;
+            hint.information(nullptr, "Zmiana hasła", "Pomyślna zmiana hasła");
+        }
+    }
+}
+
 // #################################
 // #            STAGES             #
 // #################################
@@ -386,6 +422,32 @@ void WorkerWindow::stage_scrollworker()
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addLayout(getSearchBox());
     layout->addWidget(table);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_changepasswd()
+{
+    register_worker_password = new QLineEdit;
+    register_worker_password->setEchoMode(QLineEdit::Password);
+    register_worker_password->setPlaceholderText("Stare hasło");
+
+    register_worker_password_repeat = new QLineEdit;
+    register_worker_password_repeat->setEchoMode(QLineEdit::Password);
+    register_worker_password_repeat->setPlaceholderText("Nowe hasło");
+
+    QFormLayout* form = new QFormLayout;
+    form->addRow(tr("&Stare hasło"), register_worker_password);
+    form->addRow(tr("&Nowe hasło"), register_worker_password_repeat);
+
+    QPushButton* change_passwd_button = new QPushButton(tr("&Zmień swoje hasło"));
+    connect(change_passwd_button, SIGNAL(released()), this, SLOT(account_changepasswd()));
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setAlignment(Qt::AlignTop);
+    layout->addLayout(form);
+    layout->addWidget(change_passwd_button);
 
     qDeleteAll(widget->children());
     widget->setLayout(layout);

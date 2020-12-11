@@ -32,6 +32,7 @@ public:
     void stage_homepage();
     void stage_addworker();
     void stage_scrollworker();
+    void stage_changepasswd();
 
 public slots:
     void customMenuRequested(QPoint pos);
@@ -45,6 +46,7 @@ private:
     QMenu* authorsMenu;
     QMenu* publisherMenu;
     QMenu* rentsMenu;
+    QMenu* accountMenu;
 
     QAction* addWorker;
     QAction* scroolWorker;
@@ -57,6 +59,8 @@ private:
     QAction* publisher_scroll;
     QAction* rent_add;
     QAction* rent_scroll;
+    QAction* action_menu_account_logout;
+    QAction* action_menu_account_change_passwd;
     QAction* action_table_menu_delete;
     QAction* action_table_menu_save;
 
@@ -89,8 +93,11 @@ private slots:
     void publisher_scrollSlot();
     void rent_addSlot();
     void rent_scrollSlot();
+    void account_changepasswdSlot();
+    void account_logoutSlot();
 
     void worker_add();
+    void account_changepasswd();
 
     void search_slot();
     void delete_slot();

@@ -48,6 +48,19 @@ QString User::getPassword()
     return this->password;
 }
 
+QString User::getTypeName(int account_type)
+{
+    if(account_type == ACCOUNT_CLIENT) {
+        return "client";
+    }
+
+    if(account_type == ACCOUNT_WORKER) {
+        return "worker";
+    }
+
+    return "ERROR_TYPE";
+}
+
 bool User::compare_passwords(QString password, bool hint)
 {
     if(this->password != password) {
@@ -60,9 +73,16 @@ bool User::compare_passwords(QString password, bool hint)
     return true;
 }
 
-void User::password_hash()
+QString User::password_hash()
 {
     password = QCryptographicHash::hash(password.toLocal8Bit(), QCryptographicHash::Sha3_512);
+    return password;
+}
+
+QString User::password_hash(QString password)
+{
+    password = QCryptographicHash::hash(password.toLocal8Bit(), QCryptographicHash::Sha3_512);
+    return password;
 }
 
 bool User::verify(int account_type)
@@ -110,6 +130,28 @@ bool User::login_unique(int account_type)
 
     if(query.first()) return false;
     return true;
+}
+
+bool User::change_password(QString newpassword, int account_type)
+{
+    User temp(this->login, newpassword);
+    if(temp.validate()) {
+        QSqlQuery query;
+        QString type_name = getTypeName(account_type);
+        if(!query.prepare(QString("UPDATE %1 SET password = ? WHERE login = ?").arg(type_name))) {
+            qDebug() << query.lastError();
+            return false;
+        }
+        query.addBindValue(temp.password_hash());
+        query.addBindValue(this->login);
+        if(!query.exec()) {
+            qDebug() << "change password error:" << query.lastError();
+            return false;
+        }
+        this->password = newpassword;
+        return true;
+    }
+    return false;
 }
 
 void User::set_user(User user)

@@ -66,8 +66,8 @@ void Worker::fetch_worker_data()
 
     query.first();
     type = query.value(1).toInt();
-    login = query.value(1).toString();
-    password = query.value(1).toString();
+    login = query.value(2).toString();
+    password = query.value(3).toString();
     name = query.value(4).toString();
     surname = query.value(5).toString();
 }
