@@ -14,6 +14,9 @@
 #include <QTableView>
 
 #include "worker.h"
+#include "client.h"
+#include "publisher.h"
+#include "author.h"
 
 class WorkerWindow : public QMainWindow
 {
@@ -33,6 +36,12 @@ public:
     void stage_addworker();
     void stage_scrollworker();
     void stage_changepasswd();
+    void stage_client_scroll();
+    void stage_publisher_add();
+    void stage_publisher_scroll();
+    void stage_author_add();
+    void stage_author_scroll();
+    void stage_book_add();
 
 public slots:
     void customMenuRequested(QPoint pos);
@@ -53,9 +62,9 @@ private:
     QAction* client_scroll;
     QAction* book_add;
     QAction* book_scroll;
-    QAction* author_add;
+    QAction* action_author_add;
     QAction* author_scroll;
-    QAction* publisher_add;
+    QAction* action_menu_publisher_add;
     QAction* publisher_scroll;
     QAction* rent_add;
     QAction* rent_scroll;
@@ -69,6 +78,10 @@ private:
     QLineEdit* register_worker_password_repeat;
     QLineEdit* register_worker_name;
     QLineEdit* register_worker_surname;
+    QLineEdit* register_publisher_name;
+    QLineEdit* register_publisher_description;
+    QLineEdit* register_author_name;
+    QLineEdit* register_author_surname;
     QLineEdit* search_input;
 
     QSpinBox* register_worker_type;
@@ -98,6 +111,8 @@ private slots:
 
     void worker_add();
     void account_changepasswd();
+    void publisher_add();
+    void author_add();
 
     void search_slot();
     void delete_slot();

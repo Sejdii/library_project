@@ -18,21 +18,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     address.cpp \
+    author.cpp \
+    book.cpp \
     client.cpp \
     clientwindow.cpp \
     dbmanager.cpp \
     main.cpp \
     mainwindow.cpp \
+    publisher.cpp \
+    table.cpp \
     user.cpp \
     worker.cpp \
     workerwindow.cpp
 
 HEADERS += \
     address.h \
+    author.h \
+    book.h \
     client.h \
     clientwindow.h \
     dbmanager.h \
     mainwindow.h \
+    publisher.h \
+    table.h \
     user.h \
     worker.h \
     workerwindow.h

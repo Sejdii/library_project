@@ -36,11 +36,11 @@ void WorkerWindow::create_menu()
     booksMenu->addAction(book_scroll);
 
     authorsMenu = menuBar()->addMenu(tr("&Autorzy"));
-    authorsMenu->addAction(author_add);
+    authorsMenu->addAction(action_author_add);
     authorsMenu->addAction(author_scroll);
 
     publisherMenu = menuBar()->addMenu(tr("&Wydawcy"));
-    publisherMenu->addAction(publisher_add);
+    publisherMenu->addAction(action_menu_publisher_add);
     publisherMenu->addAction(publisher_scroll);
 
     rentsMenu = menuBar()->addMenu(tr("&Wypożyczenia"));
@@ -71,14 +71,14 @@ void WorkerWindow::create_actions()
     book_scroll = new QAction(tr("&Przeglądaj książki"), this);
     connect(book_scroll, &QAction::triggered, this, &WorkerWindow::book_scrollSlot);
 
-    author_add = new QAction(tr("&Dodaj autora"), this);
-    connect(author_add, &QAction::triggered, this, &WorkerWindow::author_addSlot);
+    action_author_add = new QAction(tr("&Dodaj autora"), this);
+    connect(action_author_add, &QAction::triggered, this, &WorkerWindow::author_addSlot);
 
     author_scroll = new QAction(tr("&Przeglądaj autorów"), this);
     connect(author_scroll, &QAction::triggered, this, &WorkerWindow::author_scrollSlot);
 
-    publisher_add = new QAction(tr("&Dodaj wydawcę"), this);
-    connect(publisher_add, &QAction::triggered, this, &WorkerWindow::publisher_addSlot);
+    action_menu_publisher_add = new QAction(tr("&Dodaj wydawcę"), this);
+    connect(action_menu_publisher_add, &QAction::triggered, this, &WorkerWindow::publisher_addSlot);
 
     publisher_scroll = new QAction(tr("&Przeglądaj wydawców"), this);
     connect(publisher_scroll, &QAction::triggered, this, &WorkerWindow::publisher_scrollSlot);
@@ -127,6 +127,26 @@ void WorkerWindow::setStage(QString stage)
 
     if(stage == "changepasswd") {
         stage_changepasswd();
+    }
+
+    if(stage == "scrollclient") {
+        stage_client_scroll();
+    }
+
+    if(stage == "addpublisher") {
+        stage_publisher_add();
+    }
+
+    if(stage == "scrollpublisher") {
+        stage_publisher_scroll();
+    }
+
+    if(stage == "addauthor") {
+        stage_author_add();
+    }
+
+    if(stage == "scrollauthor") {
+        stage_author_scroll();
     }
 }
 
@@ -179,7 +199,7 @@ void WorkerWindow::worker_add()
 
 void WorkerWindow::client_scrollSlot()
 {
-    qDebug() << "client_scrollSlot()";
+    setStage("scrollclient");
 }
 
 void WorkerWindow::book_addSlot()
@@ -194,22 +214,22 @@ void WorkerWindow::book_scrollSlot()
 
 void WorkerWindow::author_addSlot()
 {
-    qDebug() << "author_addSlot";
+    setStage("addauthor");
 }
 
 void WorkerWindow::author_scrollSlot()
 {
-    qDebug() << "author_scrollSlot";
+    setStage("scrollauthor");
 }
 
 void WorkerWindow::publisher_addSlot()
 {
-    qDebug() << "publisher_addSlot";
+    setStage("addpublisher");
 }
 
 void WorkerWindow::publisher_scrollSlot()
 {
-    qDebug() << "publisher_scrollSlot";
+    setStage("scrollpublisher");
 }
 
 void WorkerWindow::rent_addSlot()
@@ -305,6 +325,23 @@ void WorkerWindow::save_slot()
         ok = ok && worker.validate();
     }
 
+    if(t_model->tableName() == "client") {
+        User user(t_record.value(1).toString(), t_record.value(2).toString());
+        ok = ok && user.validate();
+        Client client(t_record.value(3).toString(), t_record.value(4).toString(), t_record.value(5).toString(), t_record.value(6).toString());
+        ok = ok && client.validate(true);
+    }
+
+    if(t_model->tableName() == "publisher") {
+        Publisher publisher(t_record.value(1).toString(), t_record.value(2).toString());
+        ok = ok && publisher.validate();
+    }
+
+    if(t_model->tableName() == "author") {
+        Author author(t_record.value(1).toString(), t_record.value(2).toString());
+        ok = ok && author.validate();
+    }
+
     if(!ok) {
         if(!error_text.isEmpty()) {
             QMessageBox hint;
@@ -334,6 +371,24 @@ void WorkerWindow::account_changepasswd()
     }
 }
 
+void WorkerWindow::publisher_add()
+{
+    Publisher new_publisher(register_publisher_name->text(), register_publisher_description->text());
+    if(new_publisher.validate()) {
+        new_publisher.push();
+        setStage("scrollpublisher");
+    }
+}
+
+void WorkerWindow::author_add()
+{
+    Author new_author(register_author_name->text(), register_author_surname->text());
+    if(new_author.validate()) {
+        new_author.push();
+        setStage("scrollauthor");
+    }
+}
+
 // #################################
 // #            STAGES             #
 // #################################
@@ -350,7 +405,7 @@ void WorkerWindow::stage_homepage()
 
 void WorkerWindow::stage_addworker()
 {
-    QLabel* label = new QLabel("Dodaj nowego pracownika");
+    QLabel* label = new QLabel(tr("<h1>Dodaj nowego pracownika</h1>"));
 
     register_worker_login = new QLineEdit;
     register_worker_login->setPlaceholderText("Login pracownika");
@@ -448,6 +503,149 @@ void WorkerWindow::stage_changepasswd()
     layout->setAlignment(Qt::AlignTop);
     layout->addLayout(form);
     layout->addWidget(change_passwd_button);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_client_scroll()
+{
+    table = new QTableView;
+
+    QSqlTableModel* t_model = new QSqlTableModel;
+    t_model->setTable("client");
+    t_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    t_model->select();
+    t_model->setHeaderData(1, Qt::Horizontal, tr("Login"));
+    t_model->setHeaderData(3, Qt::Horizontal, tr("pesel"));
+    t_model->setHeaderData(4, Qt::Horizontal, tr("Imię"));
+    t_model->setHeaderData(5, Qt::Horizontal, tr("Nazwisko"));
+    t_model->setHeaderData(6, Qt::Horizontal, tr("E-mail"));
+
+    table->setModel(t_model);
+    table->hideColumn(0);
+    table->hideColumn(2);
+    table->hideColumn(7);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+    connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    table->setSortingEnabled(true);
+    table->show();
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addLayout(getSearchBox());
+    layout->addWidget(table);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_publisher_add()
+{
+    QLabel* label = new QLabel(tr("<h1>Dodaj nowego wydawce</h1>"));
+
+    register_publisher_name = new QLineEdit;
+    register_publisher_name->setPlaceholderText("Nazwa wydawcy");
+
+    register_publisher_description = new QLineEdit;
+    register_publisher_description->setPlaceholderText("Krótki opis wydawcy");
+
+    QFormLayout* form = new QFormLayout;
+    form->addRow(tr("&Nazwa wydawcy"), register_publisher_name);
+    form->addRow(tr("&Krótki opis"), register_publisher_description);
+
+    QPushButton* add_publisher_button = new QPushButton(tr("&Dodaj wydawce"));
+    connect(add_publisher_button, SIGNAL(released()), this, SLOT(publisher_add()));
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setAlignment(Qt::AlignTop);
+    layout->addWidget(label);
+    layout->addLayout(form);
+    layout->addWidget(add_publisher_button);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_publisher_scroll()
+{
+    table = new QTableView;
+
+    QSqlTableModel* t_model = new QSqlTableModel;
+    t_model->setTable("publisher");
+    t_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    t_model->select();
+    t_model->setHeaderData(1, Qt::Horizontal, tr("Nazwa"));
+    t_model->setHeaderData(2, Qt::Horizontal, tr("Opis"));
+
+    table->setModel(t_model);
+    table->hideColumn(0);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+    connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    table->setSortingEnabled(true);
+    table->show();
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addLayout(getSearchBox());
+    layout->addWidget(table);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_author_add()
+{
+    QLabel* label = new QLabel(tr("<h1>Dodaj nowego autora</h1>"));
+
+    register_author_name = new QLineEdit;
+    register_author_name->setPlaceholderText(tr("Imię autora"));
+
+    register_author_surname = new QLineEdit;
+    register_author_surname->setPlaceholderText(tr("Nazwisko autora"));
+
+    QFormLayout* form = new QFormLayout;
+    form->addRow(tr("&Imię"), register_author_name);
+    form->addRow(tr("&Nazwisko"), register_author_surname);
+
+    QPushButton* add_publisher_button = new QPushButton(tr("&Dodaj autora"));
+    connect(add_publisher_button, SIGNAL(released()), this, SLOT(author_add()));
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setAlignment(Qt::AlignTop);
+    layout->addWidget(label);
+    layout->addLayout(form);
+    layout->addWidget(add_publisher_button);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_author_scroll()
+{
+    table = new QTableView;
+
+    QSqlTableModel* t_model = new QSqlTableModel;
+    t_model->setTable("author");
+    t_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    t_model->select();
+    t_model->setHeaderData(1, Qt::Horizontal, tr("Imię"));
+    t_model->setHeaderData(2, Qt::Horizontal, tr("Nazwisko"));
+
+    table->setModel(t_model);
+    table->hideColumn(0);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+    connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    table->setSortingEnabled(true);
+    table->show();
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addLayout(getSearchBox());
+    layout->addWidget(table);
 
     qDeleteAll(widget->children());
     widget->setLayout(layout);

@@ -8,7 +8,7 @@ Client::Client(QString pesel, QString name, QString surname, QString email)
     this->email = email;
 }
 
-bool Client::validate()
+bool Client::validate(bool edit)
 {
     bool flag = true;
     QString error;
@@ -17,7 +17,7 @@ bool Client::validate()
     QRegularExpressionValidator validator(exp);
     int pos = 0;
 
-    if(validator.validate(pesel, pos) == QValidator::Invalid || pesel.length() == 0) {
+    if(validator.validate(pesel, pos) == QValidator::Invalid || pesel.length() == 0 || pesel.length() != 11) {
         error = "Podany pesel jest nieprawidłowy";
         flag = false;
     }
@@ -43,12 +43,12 @@ bool Client::validate()
         flag = false;
     }
 
-    if(!login_unique(ACCOUNT_CLIENT)) {
+    if(!login_unique(ACCOUNT_CLIENT) && !edit) {
         error = "Podany login jest już zajęty. Użyj innego";
         flag = false;
     }
 
-    if(!email_unique()) {
+    if(!email_unique() && !edit) {
         error = "Podany e-mail jest już w użyciu.";
         flag = false;
     }

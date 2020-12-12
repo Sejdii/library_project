@@ -21,7 +21,7 @@ private:
 public:
     Client(QString pesel, QString name, QString surname, QString email);
 
-    bool validate();
+    bool validate(bool edit=false);
     bool email_unique();
 
     void set_user(User user);

@@ -6,8 +6,14 @@
 
 #include "worker.h"
 
+/**
+ * @brief DATABASE_PATH ścieżka do pliku bazy danych
+ */
 const QString DATABASE_PATH = "library.db";
 
+/**
+ * @brief Klasa DBManger do zarządzania bazą danych
+ */
 class DBManager
 {
 public:
