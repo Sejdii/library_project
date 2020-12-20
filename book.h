@@ -8,7 +8,7 @@
 class Book : public Table
 {
 public:
-    Book();
+    Book(QString isbn, QString title, unsigned int publisher_id, unsigned int publish_year, QString description, unsigned int items_nr);
 private:
     QString isbn;
     QString title;

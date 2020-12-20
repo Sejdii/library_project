@@ -1,7 +1,6 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-
 class Table
 {
 public:
@@ -9,7 +8,8 @@ public:
 
     virtual int push() = 0;
 
-    virtual bool validate() = 0;
+    virtual bool validate(bool edit=false) = 0;
+
 private:
     unsigned int id;
 };

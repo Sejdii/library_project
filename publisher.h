@@ -14,9 +14,12 @@ class Publisher : public Table
 public:
     Publisher(QString name, QString description);
 
-    bool validate() override;
+    bool validate(bool edit=false) override;
+    bool check_name_unique();
 
     int push() override;
+
+    static QStringList get_completer_list();
 
 private:
     QString name;

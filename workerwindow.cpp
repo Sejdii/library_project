@@ -32,7 +32,7 @@ void WorkerWindow::create_menu()
     }
 
     booksMenu = menuBar()->addMenu(tr("&Książki"));
-    booksMenu->addAction(book_add);
+    booksMenu->addAction(action_book_add);
     booksMenu->addAction(book_scroll);
 
     authorsMenu = menuBar()->addMenu(tr("&Autorzy"));
@@ -65,8 +65,8 @@ void WorkerWindow::create_actions()
     client_scroll = new QAction(tr("&Przeglądaj klientów"), this);
     connect(client_scroll, &QAction::triggered, this, &WorkerWindow::client_scrollSlot);
 
-    book_add = new QAction(tr("&Dodaj książkę"), this);
-    connect(book_add, &QAction::triggered, this, &WorkerWindow::book_addSlot);
+    action_book_add = new QAction(tr("&Dodaj książkę"), this);
+    connect(action_book_add, &QAction::triggered, this, &WorkerWindow::book_addSlot);
 
     book_scroll = new QAction(tr("&Przeglądaj książki"), this);
     connect(book_scroll, &QAction::triggered, this, &WorkerWindow::book_scrollSlot);
@@ -148,6 +148,10 @@ void WorkerWindow::setStage(QString stage)
     if(stage == "scrollauthor") {
         stage_author_scroll();
     }
+
+    if(stage == "addbook") {
+        stage_book_add();
+    }
 }
 
 QHBoxLayout* WorkerWindow::getSearchBox()
@@ -204,12 +208,12 @@ void WorkerWindow::client_scrollSlot()
 
 void WorkerWindow::book_addSlot()
 {
-    qDebug() << "book_addSlot";
+    setStage("addbook");
 }
 
 void WorkerWindow::book_scrollSlot()
 {
-    qDebug() << "book_scrollSlot";
+    qDebug() << "book_scrollSlot"; // TO DO
 }
 
 void WorkerWindow::author_addSlot()
@@ -234,12 +238,12 @@ void WorkerWindow::publisher_scrollSlot()
 
 void WorkerWindow::rent_addSlot()
 {
-    qDebug() << "rent_addSlot";
+    qDebug() << "rent_addSlot"; // TO DO
 }
 
 void WorkerWindow::rent_scrollSlot()
 {
-    qDebug() << "rent_scrollSlot";
+    qDebug() << "rent_scrollSlot"; // TO DO
 }
 
 void WorkerWindow::account_changepasswdSlot()
@@ -334,7 +338,7 @@ void WorkerWindow::save_slot()
 
     if(t_model->tableName() == "publisher") {
         Publisher publisher(t_record.value(1).toString(), t_record.value(2).toString());
-        ok = ok && publisher.validate();
+        ok = ok && publisher.validate(true);
     }
 
     if(t_model->tableName() == "author") {
@@ -387,6 +391,11 @@ void WorkerWindow::author_add()
         new_author.push();
         setStage("scrollauthor");
     }
+}
+
+void WorkerWindow::book_add()
+{
+
 }
 
 // #################################
@@ -646,6 +655,57 @@ void WorkerWindow::stage_author_scroll()
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addLayout(getSearchBox());
     layout->addWidget(table);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+
+void WorkerWindow::stage_book_add()
+{
+    QLabel* label = new QLabel(tr("<h1>Dodaj nową książkę</h1>"));
+
+    register_book_isbn = new QLineEdit;
+    register_book_isbn->setPlaceholderText("ISBN książki");
+
+    register_book_title = new QLineEdit;
+    register_book_title->setPlaceholderText("Tytuł książki");
+
+    register_book_publisher_id = new QLineEdit;
+    register_book_publisher_id->setPlaceholderText("Wpisz nazwę wydawcy");
+    QCompleter* completer = new QCompleter(Publisher::get_completer_list(), this);
+    register_book_publisher_id->setCompleter(completer);
+
+    register_book_year = new QSpinBox();
+    register_book_year->setRange(1800, QDate::currentDate().year());
+
+    register_book_description = new QLineEdit();
+    register_book_description->setPlaceholderText("Opis ksiązki");
+
+    register_book_items_nr = new QSpinBox();
+    register_book_items_nr->setMinimum(0);
+
+    register_book_author = new QLineEdit;
+    register_book_author->setPlaceholderText("Wpisz imię i nazwisko autora");
+    QCompleter* completer_author = new QCompleter(Author::get_completer_list(), this);
+    register_book_author->setCompleter(completer_author);
+
+    QFormLayout* form = new QFormLayout;
+    form->addRow("ISBN książki", register_book_isbn);
+    form->addRow("Tytuł książki", register_book_title);
+    form->addRow("Wybierz wydawce", register_book_publisher_id);
+    form->addRow("Rok wydania", register_book_year);
+    form->addRow("Liczba egzemplarzy", register_book_items_nr);
+    form->addRow("Wybierz autora", register_book_author);
+
+    QPushButton* add_book_button = new QPushButton(tr("&Dodaj książkę"));
+    connect(add_book_button, SIGNAL(released()), this, SLOT(book_add()));
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setAlignment(Qt::AlignTop);
+    layout->addWidget(label);
+    layout->addLayout(form);
+    layout->addWidget(add_book_button);
 
     qDeleteAll(widget->children());
     widget->setLayout(layout);

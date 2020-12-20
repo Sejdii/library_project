@@ -12,11 +12,14 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTableView>
+#include <QCompleter>
+#include <QTreeView>
 
 #include "worker.h"
 #include "client.h"
 #include "publisher.h"
 #include "author.h"
+#include "book.h"
 
 class WorkerWindow : public QMainWindow
 {
@@ -60,7 +63,7 @@ private:
     QAction* addWorker;
     QAction* scroolWorker;
     QAction* client_scroll;
-    QAction* book_add;
+    QAction* action_book_add;
     QAction* book_scroll;
     QAction* action_author_add;
     QAction* author_scroll;
@@ -82,9 +85,16 @@ private:
     QLineEdit* register_publisher_description;
     QLineEdit* register_author_name;
     QLineEdit* register_author_surname;
+    QLineEdit* register_book_isbn;
+    QLineEdit* register_book_title;
+    QLineEdit* register_book_description;
+    QLineEdit* register_book_publisher_id;
+    QLineEdit* register_book_author;
     QLineEdit* search_input;
 
     QSpinBox* register_worker_type;
+    QSpinBox* register_book_items_nr;
+    QSpinBox* register_book_year;
 
     QTableView* table;
 
@@ -113,6 +123,7 @@ private slots:
     void account_changepasswd();
     void publisher_add();
     void author_add();
+    void book_add();
 
     void search_slot();
     void delete_slot();

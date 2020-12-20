@@ -6,7 +6,7 @@ Author::Author(QString name, QString surname)
     this->surname = surname;
 }
 
-bool Author::validate()
+bool Author::validate(bool edit)
 {
     bool ok = true;
     QString error_text;
@@ -24,6 +24,8 @@ bool Author::validate()
         error_text = "Podane nazwisko jest nieprawidłowe";
         ok = false;
     }
+
+    if(edit) NULL; // brak użycia pola edit dla tej tabeli
 
     if(!ok) {
         QMessageBox hint;
@@ -54,4 +56,28 @@ int Author::push()
     id = query.lastInsertId().toInt();
 
     return id;
+}
+
+QStringList Author::get_completer_list()
+{
+    QSqlQuery query;
+    QStringList stringlist;
+
+    if(!query.prepare("SELECT name || ' ' || surname AS auth_name FROM author")) {
+        qDebug() << "Author get completer list prepere error: " << query.lastError();
+        return stringlist;
+    }
+
+    if(!query.exec()) {
+        qDebug() << "Author get completer list exec error: " << query.lastError();
+        return stringlist;
+    }
+
+    int field_num = query.record().indexOf("auth_name");
+    while(query.next()) {
+        QString name = query.value(field_num).toString();
+        stringlist << name;
+    }
+
+    return stringlist;
 }

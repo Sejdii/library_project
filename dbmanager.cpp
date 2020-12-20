@@ -50,7 +50,7 @@ bool DBManager::initial_database(const QString& path, bool force)
     // CREATING PUBLISHER TABLE
     value = "CREATE TABLE publisher("
                   "id integer NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                  "name varchar(128) NOT NULL,"
+                  "name varchar(128) NOT NULL UNIQUE,"
                   "description text NULL"
                   ");";
     if(!query.exec(value)) {

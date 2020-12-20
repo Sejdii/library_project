@@ -16,7 +16,10 @@ public:
 
     int push() override;
 
-    bool validate() override;
+    bool validate(bool edit=false) override;
+
+    static QStringList get_completer_list();
+
 private:
     QString name;
     QString surname;
