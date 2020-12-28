@@ -17,32 +17,32 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    address.cpp \
-    author.cpp \
-    book.cpp \
-    client.cpp \
     clientwindow.cpp \
-    dbmanager.cpp \
     main.cpp \
     mainwindow.cpp \
-    publisher.cpp \
-    table.cpp \
-    user.cpp \
-    worker.cpp \
+    src/address.cpp \
+    src/author.cpp \
+    src/book.cpp \
+    src/client.cpp \
+    src/dbmanager.cpp \
+    src/publisher.cpp \
+    src/table.cpp \
+    src/user.cpp \
+    src/worker.cpp \
     workerwindow.cpp
 
 HEADERS += \
-    address.h \
-    author.h \
-    book.h \
-    client.h \
     clientwindow.h \
-    dbmanager.h \
+    lib/address.h \
+    lib/author.h \
+    lib/book.h \
+    lib/client.h \
+    lib/dbmanager.h \
+    lib/publisher.h \
+    lib/table.h \
+    lib/user.h \
+    lib/worker.h \
     mainwindow.h \
-    publisher.h \
-    table.h \
-    user.h \
-    worker.h \
     workerwindow.h
 
 FORMS += \

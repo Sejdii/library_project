@@ -1,4 +1,4 @@
-#include "address.h"
+#include "lib/address.h"
 
 Address::Address(QString city, QString post_code, QString street, int home_nr, int flat_nr)
 {

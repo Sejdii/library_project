@@ -152,6 +152,10 @@ void WorkerWindow::setStage(QString stage)
     if(stage == "addbook") {
         stage_book_add();
     }
+
+    if(stage == "scrollbook") {
+        stage_book_scroll();
+    }
 }
 
 QHBoxLayout* WorkerWindow::getSearchBox()
@@ -213,7 +217,7 @@ void WorkerWindow::book_addSlot()
 
 void WorkerWindow::book_scrollSlot()
 {
-    qDebug() << "book_scrollSlot"; // TO DO
+    setStage("scrollbook");
 }
 
 void WorkerWindow::author_addSlot()
@@ -343,7 +347,12 @@ void WorkerWindow::save_slot()
 
     if(t_model->tableName() == "author") {
         Author author(t_record.value(1).toString(), t_record.value(2).toString());
-        ok = ok && author.validate();
+        ok = ok && author.validate(true);
+    }
+
+    if(t_model->tableName() == "book") {
+        Book book(t_record.value(1).toString(), t_record.value(2).toString(), "NOT USED", t_record.value(4).toInt(), t_record.value(5).toString(), t_record.value(6).toInt());
+        ok = ok && book.validate(true);
     }
 
     if(!ok) {
@@ -395,7 +404,18 @@ void WorkerWindow::author_add()
 
 void WorkerWindow::book_add()
 {
-
+    Book new_book(register_book_isbn->text(), register_book_title->text(), register_book_publisher_id->text(), register_book_year->text().toInt(), register_book_description->text(), register_book_items_nr->text().toInt());
+    if(new_book.validate()) {
+        int author_id = Author::get_id(register_book_author->text());
+        if(author_id != -1) {
+            new_book.push();
+            new_book.make_connection_author(author_id);
+            setStage("scrollbook");
+        } else {
+            QMessageBox hint;
+            hint.warning(nullptr, "Nieprawidłowe dane", "Podany autor nie istnieje, proszę wpisać właściwego autora");
+        }
+    }
 }
 
 // #################################
@@ -706,6 +726,38 @@ void WorkerWindow::stage_book_add()
     layout->addWidget(label);
     layout->addLayout(form);
     layout->addWidget(add_book_button);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_book_scroll()
+{
+    table = new QTableView;
+
+    QSqlTableModel* t_model = new QSqlTableModel;
+    t_model->setTable("book");
+    t_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    t_model->select();
+    t_model->setHeaderData(1, Qt::Horizontal, tr("ISBN"));
+    t_model->setHeaderData(2, Qt::Horizontal, tr("Tytuł"));
+    t_model->setHeaderData(4, Qt::Horizontal, tr("Rok opublikowania"));
+    t_model->setHeaderData(5, Qt::Horizontal, tr("Opis"));
+    t_model->setHeaderData(6, Qt::Horizontal, tr("Liczba egzemplarzy"));
+
+    table->setModel(t_model);
+    table->hideColumn(0);
+    table->hideColumn(3);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+    connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    table->setSortingEnabled(true);
+    table->show();
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addLayout(getSearchBox());
+    layout->addWidget(table);
 
     qDeleteAll(widget->children());
     widget->setLayout(layout);

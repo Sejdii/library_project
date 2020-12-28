@@ -1,4 +1,4 @@
-#include "worker.h"
+#include "lib/worker.h"
 
 Worker::Worker(int type, QString name, QString surname)
 {

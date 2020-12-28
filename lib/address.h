@@ -6,7 +6,7 @@
 #include <QRegularExpression>
 #include <QMessageBox>
 
-#include "dbmanager.h"
+#include "lib/dbmanager.h"
 
 class Address
 {

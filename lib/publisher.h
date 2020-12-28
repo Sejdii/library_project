@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <QtSql>
 
-#include "table.h"
+#include "lib/table.h"
 
 class Publisher : public Table
 {

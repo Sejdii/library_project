@@ -1,13 +1,13 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "user.h"
+#include "lib/user.h"
 #include <QString>
 #include <QMessageBox>
 #include <QValidator>
 #include <QRegularExpression>
 
-#include "dbmanager.h"
+#include "lib/dbmanager.h"
 
 class Client : public User
 {

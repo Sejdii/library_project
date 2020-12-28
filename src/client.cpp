@@ -1,4 +1,4 @@
-#include "client.h"
+#include "lib/client.h"
 
 Client::Client(QString pesel, QString name, QString surname, QString email)
 {

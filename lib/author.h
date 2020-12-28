@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include <QtSql>
 
-#include "table.h"
+#include "lib/table.h"
 
 class Author : public Table
 {
@@ -19,6 +19,8 @@ public:
     bool validate(bool edit=false) override;
 
     static QStringList get_completer_list();
+
+    static int get_id(QString name);
 
 private:
     QString name;

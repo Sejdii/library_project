@@ -1,4 +1,4 @@
-#include "dbmanager.h"
+#include "lib/dbmanager.h"
 #include <QFileInfo>
 
 DBManager::DBManager(const QString& path)

@@ -1,4 +1,4 @@
-#include "author.h"
+#include "lib/author.h"
 
 Author::Author(QString name, QString surname)
 {
@@ -80,4 +80,24 @@ QStringList Author::get_completer_list()
     }
 
     return stringlist;
+}
+
+int Author::get_id(QString name)
+{
+    QSqlQuery query;
+
+    if(!query.prepare("SELECT id FROM author WHERE name || ' ' || surname = ?")) {
+        qDebug() << "Author get id prepere error: " << query.lastError();
+        return -1;
+    }
+
+    query.addBindValue(name);
+
+    if(!query.exec()) {
+        qDebug() << "Author get id exec error: " << query.lastError();
+        return -1;
+    }
+
+    if(query.first()) return query.value(0).toInt();
+    return -1;
 }

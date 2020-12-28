@@ -4,7 +4,7 @@
 #include <QString>
 #include <QtSql>
 
-#include "worker.h"
+#include "lib/worker.h"
 
 /**
  * @brief DATABASE_PATH ścieżka do pliku bazy danych

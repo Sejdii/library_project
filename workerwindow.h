@@ -15,11 +15,11 @@
 #include <QCompleter>
 #include <QTreeView>
 
-#include "worker.h"
-#include "client.h"
-#include "publisher.h"
-#include "author.h"
-#include "book.h"
+#include "lib/worker.h"
+#include "lib/client.h"
+#include "lib/publisher.h"
+#include "lib/author.h"
+#include "lib/book.h"
 
 class WorkerWindow : public QMainWindow
 {
@@ -45,6 +45,7 @@ public:
     void stage_author_add();
     void stage_author_scroll();
     void stage_book_add();
+    void stage_book_scroll();
 
 public slots:
     void customMenuRequested(QPoint pos);

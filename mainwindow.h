@@ -8,9 +8,9 @@
 #include <QSpinBox>
 #include <QShortcut>
 
-#include <address.h>
-#include "client.h"
-#include "user.h"
+#include <lib/address.h>
+#include "lib/client.h"
+#include "lib/user.h"
 #include "clientwindow.h"
 #include "workerwindow.h"
 

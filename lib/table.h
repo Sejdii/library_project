@@ -10,7 +10,7 @@ public:
 
     virtual bool validate(bool edit=false) = 0;
 
-private:
+protected:
     unsigned int id;
 };
 

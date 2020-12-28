@@ -1,4 +1,4 @@
-#include "publisher.h"
+#include "lib/publisher.h"
 
 Publisher::Publisher(QString name, QString description)
 {

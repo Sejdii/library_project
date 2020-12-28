@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include <user.h>
+#include <lib/user.h>
 
 const int WORKER_DEF_TYPE = 0;
 const int WORKER_ADM_TYPE = 1;
