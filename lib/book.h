@@ -24,6 +24,12 @@ public:
     int get_id_publisher();
 
     int make_connection_author(int author_id);
+    
+    static QStringList get_completer_list();
+    
+    static int is_exist(QString isbn);
+    
+    static bool check_availability(unsigned int id);
 
 private:
     QString isbn;
@@ -33,6 +39,7 @@ private:
     unsigned int publish_year;
     QString description;
     unsigned int items_nr;
+    unsigned int author_id;
 };
 
 #endif // BOOK_H

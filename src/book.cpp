@@ -97,7 +97,7 @@ int Book::push()
 {
     QSqlQuery query;
 
-    if(!query.prepare("INSERT INTO book VALUES (NULL, ?, ?, ?, ?, ?, ?)")) {
+    if(!query.prepare("INSERT INTO book VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)")) {
         qDebug() << "Push book prepere error:" << query.lastError();
         return -1;
     }
@@ -108,6 +108,7 @@ int Book::push()
     query.addBindValue(publish_year);
     query.addBindValue(description);
     query.addBindValue(items_nr);
+    query.addBindValue(author_id);
 
     if(!query.exec()) {
         qDebug() << "Push book exec error:" << query.lastError();
@@ -120,20 +121,101 @@ int Book::push()
 
 int Book::make_connection_author(int author_id)
 {
+    this->author_id = author_id;
+    return author_id;
+}
+
+QStringList Book::get_completer_list()
+{
     QSqlQuery query;
+    QStringList stringlist;
 
-    if(!query.prepare("INSERT INTO book_author VALUES (NULL, ?, ?)")) {
-        qDebug() << "Book make connection author prepere error:" << query.lastError();
-        return -1;
+    if(!query.prepare("SELECT isbn FROM book")) {
+        qDebug() << "Book get completer list prepere error: " << query.lastError();
+        return stringlist;
     }
-
-    query.addBindValue(id);
-    query.addBindValue(author_id);
 
     if(!query.exec()) {
-        qDebug() << "Book make connection author exec error:" << query.lastError();
-        return -1;
+        qDebug() << "Book get completer list exec error: " << query.lastError();
+        return stringlist;
     }
 
-    return query.lastInsertId().toInt();
+    int field_num = query.record().indexOf("isbn");
+    while(query.next()) {
+        QString name = query.value(field_num).toString();
+        stringlist << name;
+    }
+
+    return stringlist;
+}
+
+int Book::is_exist(QString isbn)
+{
+    QSqlQuery query;
+    
+    if(!query.prepare("SELECT id FROM book WHERE isbn=?")) {
+        qDebug() << "Book is exist prepere error: " << query.lastError();
+        return -1;
+    }
+    
+    query.addBindValue(isbn);
+    
+    if(!query.exec()) {
+        qDebug() << "Book is exist exec error: " << query.lastError();
+        return -1;
+    }
+    
+    if(!query.first()) return -1;
+    return query.value(0).toInt();
+}
+
+bool Book::check_availability(unsigned int id)
+{
+    QSqlQuery query_count;
+    
+    if(!query_count.prepare("SELECT COUNT(id) FROM rent WHERE book_id=?")) {
+        qDebug() << "Book check availability prepere error: " << query_count.lastError();
+        return false;
+    }
+    
+    query_count.addBindValue(id);
+    
+    if(!query_count.exec()) {
+        qDebug() << "Book check availability exec error: " << query_count.lastError();
+        return false;
+    }
+    
+    if(!query_count.first()) {
+        return false;
+    }
+    
+    int rent_count = query_count.value(0).toInt();
+    
+    QSqlQuery query_items;
+    
+    if(!query_items.prepare("SELECT items_nr FROM book WHERE id=?")) {
+        qDebug() << "Book check availability prepere error: " << query_items.lastError();
+        return false;
+    }
+    
+    query_items.addBindValue(id);
+    
+    if(!query_items.exec()) {
+        qDebug() << "Book check availability exec error: " << query_items.lastError();
+        return false;
+    }
+    
+    if(!query_items.first()) {
+        return false;
+    }
+    
+    int items_nr = query_items.value(0).toInt();
+    
+    qDebug() << rent_count << " " << items_nr;
+    
+    if(rent_count == items_nr) {
+        return false;
+    }
+    
+    return true;
 }

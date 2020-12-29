@@ -5,7 +5,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    DBManager::initial_database(DATABASE_PATH);
+    DBManager::initial_database(DATABASE_PATH); // INITIAL THE DATABASE FILE IF NOT EXIST
     DBManager database(DATABASE_PATH);
     this->setWindow();
     this->setStage("homepage");

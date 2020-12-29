@@ -40,7 +40,9 @@ bool DBManager::initial_database(const QString& path, bool force)
                "publish_year YEAR NOT NULL,"
                "decription text NULL,"
                "items_nr int NOT NULL,"
-               "FOREIGN KEY(publisher_id) REFERENCES publisher(id)"
+               "author_id int NOT NULL,"
+               "FOREIGN KEY(publisher_id) REFERENCES publisher(id),"
+               "FOREIGN KEY(author_id) REFERENCES author(id)"
                ");";
     if(!query.exec(value)) {
         qDebug() << "Add book table error: " << query.lastError();
@@ -128,19 +130,6 @@ bool DBManager::initial_database(const QString& path, bool force)
            ");";
    if(!query.exec(value)) {
        qDebug() << "Add author table error:" << query.lastError();
-       return false;
-   }
-
-   // CREATING BOOK_AUTHOR TABLE
-   value = "CREATE TABLE book_author("
-           "id integer NOT NULL PRIMARY KEY AUTOINCREMENT,"
-           "book_id integer NOT NULL,"
-           "author_id integer NOT NULL,"
-           "FOREIGN KEY(book_id) REFERENCES book(id),"
-           "FOREIGN KEY(author_id) REFERENCES author(id)"
-           ");";
-   if(!query.exec(value)) {
-       qDebug() << "Add book_author table error:" << query.lastError();
        return false;
    }
 

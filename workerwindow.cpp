@@ -44,7 +44,7 @@ void WorkerWindow::create_menu()
     publisherMenu->addAction(publisher_scroll);
 
     rentsMenu = menuBar()->addMenu(tr("&Wypożyczenia"));
-    rentsMenu->addAction(rent_add);
+    rentsMenu->addAction(action_rent_add);
     rentsMenu->addAction(rent_scroll);
 
     accountMenu = menuBar()->addMenu(tr("&Twoje konto"));
@@ -83,8 +83,8 @@ void WorkerWindow::create_actions()
     publisher_scroll = new QAction(tr("&Przeglądaj wydawców"), this);
     connect(publisher_scroll, &QAction::triggered, this, &WorkerWindow::publisher_scrollSlot);
 
-    rent_add = new QAction(tr("&Dodaj wypożyczenie"), this);
-    connect(rent_add, &QAction::triggered, this, &WorkerWindow::rent_addSlot);
+    action_rent_add = new QAction(tr("&Dodaj wypożyczenie"), this);
+    connect(action_rent_add, &QAction::triggered, this, &WorkerWindow::rent_addSlot);
 
     rent_scroll = new QAction(tr("&Przeglądaj wypożyczenia"), this);
     connect(rent_scroll, &QAction::triggered, this, &WorkerWindow::rent_scrollSlot);
@@ -102,6 +102,9 @@ void WorkerWindow::create_actions()
 
     action_table_menu_save = new QAction(tr("&Zapisz zmiany"), this);
     connect(action_table_menu_save, &QAction::triggered, this, &WorkerWindow::save_slot);
+    
+    action_table_menu_copy_id = new QAction(tr("&Kopiuj ID"), this);
+    connect(action_table_menu_copy_id, &QAction::triggered, this, &WorkerWindow::copy_id_slot);
 }
 
 void WorkerWindow::set_worker(unsigned int id)
@@ -155,6 +158,14 @@ void WorkerWindow::setStage(QString stage)
 
     if(stage == "scrollbook") {
         stage_book_scroll();
+    }
+    
+    if(stage == "addrent") {
+        stage_rent_add();
+    }
+    
+    if(stage == "scrollrent") {
+        stage_rent_scroll();
     }
 }
 
@@ -242,12 +253,12 @@ void WorkerWindow::publisher_scrollSlot()
 
 void WorkerWindow::rent_addSlot()
 {
-    qDebug() << "rent_addSlot"; // TO DO
+    setStage("addrent");
 }
 
 void WorkerWindow::rent_scrollSlot()
 {
-    qDebug() << "rent_scrollSlot"; // TO DO
+    setStage("scrollrent");
 }
 
 void WorkerWindow::account_changepasswdSlot()
@@ -263,11 +274,12 @@ void WorkerWindow::account_logoutSlot()
 void WorkerWindow::customMenuRequested(QPoint pos)
 {
     QModelIndex index = table->indexAt(pos);
-    //index = index.siblingAtColumn(0);
-    //table_row_id = index.data().toInt();
     table_row_id = index.row();
+    index = index.siblingAtColumn(0);
+    clipboard = index.data().toInt();
 
     QMenu* tab_menu = new QMenu(this);
+    tab_menu->addAction(action_table_menu_copy_id);
     tab_menu->addAction(action_table_menu_delete);
     tab_menu->addAction(action_table_menu_save);
     tab_menu->popup(table->viewport()->mapToGlobal(pos));
@@ -311,6 +323,44 @@ void WorkerWindow::delete_slot()
         }
     }
 
+    if(t_model->tableName() == "author") {
+        int author_id = t_record.value(0).toInt();
+        QSqlQuery query;
+        if(!query.prepare("SELECT id FROM book WHERE author_id = ?")) {
+            qDebug() << "delete slot author prepare error: " << query.lastError();
+            return;
+        }
+        query.addBindValue(author_id);
+        if(!query.exec()) {
+            qDebug() << "delete slot author exec error: " << query.lastError();
+            return;
+        }
+        if(query.first()) {
+            QMessageBox hint;
+            hint.warning(nullptr, "Blokada dostępu" , "Nie można usunąć autora do którego są przypisane jakieś książki");
+            return;
+        }
+    }
+    
+    if(t_model->tableName() == "publisher") {
+        int publisher_id = t_record.value(0).toInt();
+        QSqlQuery query;
+        if(!query.prepare("SELECT id FROM book WHERE publisher_id = ?")) {
+            qDebug() << "delete slot publisher prepare error: " << query.lastError();
+            return;
+        }
+        query.addBindValue(publisher_id);
+        if(!query.exec()) {
+            qDebug() << "delete slot publisher exec error: " << query.lastError();
+            return;
+        }
+        if(query.first()) {
+            QMessageBox hint;
+            hint.warning(nullptr, "Blokada dostępu" , "Nie można usunąć wydawce do którego są przypisane jakieś książki");
+            return;
+        }
+    }
+    
     t_model->removeRow(table_row_id);
     t_model->submitAll();
 }
@@ -366,6 +416,12 @@ void WorkerWindow::save_slot()
     t_model->submitAll();
 }
 
+void WorkerWindow::copy_id_slot()
+{
+    QClipboard *clipboard_sys = QGuiApplication::clipboard();
+    clipboard_sys->setText(QString::number(clipboard));
+}
+
 void WorkerWindow::table_on_change()
 {
     QSqlTableModel* t_model = (QSqlTableModel*)(table->model());
@@ -408,13 +464,22 @@ void WorkerWindow::book_add()
     if(new_book.validate()) {
         int author_id = Author::get_id(register_book_author->text());
         if(author_id != -1) {
-            new_book.push();
             new_book.make_connection_author(author_id);
+            new_book.push();
             setStage("scrollbook");
         } else {
             QMessageBox hint;
             hint.warning(nullptr, "Nieprawidłowe dane", "Podany autor nie istnieje, proszę wpisać właściwego autora");
         }
+    }
+}
+
+void WorkerWindow::rent_add()
+{
+    Rent new_data(register_rent_book->text(), worker->getID(), register_rent_client->text().toUInt(), register_rent_time_start->dateTime().toString(), register_rent_time_end->dateTime().toString());
+    if(new_data.validate()) {
+        new_data.push();
+        setStage("scrollrent");
     }
 }
 
@@ -545,6 +610,7 @@ void WorkerWindow::stage_client_scroll()
     t_model->setTable("client");
     t_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     t_model->select();
+    t_model->setHeaderData(0, Qt::Horizontal, tr("Numer karty"));
     t_model->setHeaderData(1, Qt::Horizontal, tr("Login"));
     t_model->setHeaderData(3, Qt::Horizontal, tr("pesel"));
     t_model->setHeaderData(4, Qt::Horizontal, tr("Imię"));
@@ -552,7 +618,6 @@ void WorkerWindow::stage_client_scroll()
     t_model->setHeaderData(6, Qt::Horizontal, tr("E-mail"));
 
     table->setModel(t_model);
-    table->hideColumn(0);
     table->hideColumn(2);
     table->hideColumn(7);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -748,6 +813,73 @@ void WorkerWindow::stage_book_scroll()
     table->setModel(t_model);
     table->hideColumn(0);
     table->hideColumn(3);
+    table->hideColumn(7);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+    connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    table->setSortingEnabled(true);
+    table->show();
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addLayout(getSearchBox());
+    layout->addWidget(table);
+
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_rent_add()
+{
+    QLabel* label = new QLabel(tr("<h1>Dodaj nową książkę</h1>"));
+    
+    register_rent_book = new QLineEdit;
+    register_rent_book->setPlaceholderText(tr("Wpisz ISBN książki"));
+    QCompleter* completer_book = new QCompleter(Book::get_completer_list(), this);
+    register_rent_book->setCompleter(completer_book);
+    
+    register_rent_client = new QLineEdit;
+    register_rent_client->setPlaceholderText(tr("Wpisz numer karty klienta"));
+    QCompleter* completer_client = new QCompleter(Client::get_completer_list(), this);
+    register_rent_client->setCompleter(completer_client);
+    
+    register_rent_time_start = new QDateTimeEdit(QDate::currentDate());
+    register_rent_time_start->setMaximumDate(QDate::currentDate());
+    register_rent_time_start->setCalendarPopup(true);
+    
+    register_rent_time_end = new QDateTimeEdit(QDate::currentDate());
+    register_rent_time_end->setMinimumDate(QDate::currentDate().addDays(1));
+    register_rent_time_end->setCalendarPopup(true);
+    
+    QFormLayout* form = new QFormLayout;
+    form->addRow(tr("Wybierz książkę po ISBN"), register_rent_book);
+    form->addRow(tr("Wybierz klienta po numerze karty"), register_rent_client);
+    form->addRow(tr("Wprowadź datę początku wypożyczenia"), register_rent_time_start);
+    form->addRow(tr("Wprowadź datę końca wypożyczenia"), register_rent_time_end);
+    
+    QPushButton* submit_button = new QPushButton(tr("&Dodaj wypożyczenie"));
+    connect(submit_button, SIGNAL(released()), this, SLOT(rent_add()));
+    
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->setAlignment(Qt::AlignTop);
+    layout->addWidget(label);
+    layout->addLayout(form);
+    layout->addWidget(submit_button);
+    
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void WorkerWindow::stage_rent_scroll()
+{
+    table = new QTableView;
+
+    QSqlTableModel* t_model = new QSqlTableModel;
+    t_model->setTable("rent");
+    t_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    t_model->select();
+
+    table->setModel(t_model);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));

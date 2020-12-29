@@ -26,6 +26,7 @@ SOURCES += \
     src/client.cpp \
     src/dbmanager.cpp \
     src/publisher.cpp \
+    src/rent.cpp \
     src/table.cpp \
     src/user.cpp \
     src/worker.cpp \
@@ -39,14 +40,14 @@ HEADERS += \
     lib/client.h \
     lib/dbmanager.h \
     lib/publisher.h \
+    lib/rent.h \
     lib/table.h \
     lib/user.h \
     lib/worker.h \
     mainwindow.h \
     workerwindow.h
 
-FORMS += \
-    mainwindow.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

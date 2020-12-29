@@ -28,6 +28,10 @@ public:
     void set_addr(unsigned int id);
 
     int push();
+    
+    static QStringList get_completer_list();
+    
+    static int is_exist(unsigned int id);
 };
 
 #endif // CLIENT_H

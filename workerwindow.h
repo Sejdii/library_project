@@ -14,12 +14,16 @@
 #include <QTableView>
 #include <QCompleter>
 #include <QTreeView>
+#include <QClipboard>
+#include <QGuiApplication>
+#include <QDateTimeEdit>
 
 #include "lib/worker.h"
 #include "lib/client.h"
 #include "lib/publisher.h"
 #include "lib/author.h"
 #include "lib/book.h"
+#include "lib/rent.h"
 
 class WorkerWindow : public QMainWindow
 {
@@ -46,6 +50,8 @@ public:
     void stage_author_scroll();
     void stage_book_add();
     void stage_book_scroll();
+    void stage_rent_add();
+    void stage_rent_scroll();
 
 public slots:
     void customMenuRequested(QPoint pos);
@@ -70,12 +76,13 @@ private:
     QAction* author_scroll;
     QAction* action_menu_publisher_add;
     QAction* publisher_scroll;
-    QAction* rent_add;
+    QAction* action_rent_add;
     QAction* rent_scroll;
     QAction* action_menu_account_logout;
     QAction* action_menu_account_change_passwd;
     QAction* action_table_menu_delete;
     QAction* action_table_menu_save;
+    QAction* action_table_menu_copy_id;
 
     QLineEdit* register_worker_login;
     QLineEdit* register_worker_password;
@@ -91,11 +98,16 @@ private:
     QLineEdit* register_book_description;
     QLineEdit* register_book_publisher_id;
     QLineEdit* register_book_author;
+    QLineEdit* register_rent_book;
+    QLineEdit* register_rent_client;
     QLineEdit* search_input;
 
     QSpinBox* register_worker_type;
     QSpinBox* register_book_items_nr;
     QSpinBox* register_book_year;
+    
+    QDateTimeEdit* register_rent_time_start;
+    QDateTimeEdit* register_rent_time_end;
 
     QTableView* table;
 
@@ -104,6 +116,8 @@ private:
     int w_type;
 
     int table_row_id;
+    
+    int clipboard;
 
 private slots:
     void addWorkerSlot();
@@ -125,10 +139,12 @@ private slots:
     void publisher_add();
     void author_add();
     void book_add();
+    void rent_add();
 
     void search_slot();
     void delete_slot();
     void save_slot();
+    void copy_id_slot();
     void table_on_change();
 };
 

@@ -113,3 +113,47 @@ bool Client::email_unique()
     if(query.first()) return false;
     return true;
 }
+
+QStringList Client::get_completer_list()
+{
+    QSqlQuery query;
+    QStringList stringlist;
+
+    if(!query.prepare("SELECT id FROM client")) {
+        qDebug() << "Book get completer list prepere error: " << query.lastError();
+        return stringlist;
+    }
+
+    if(!query.exec()) {
+        qDebug() << "Book get completer list exec error: " << query.lastError();
+        return stringlist;
+    }
+
+    int field_num = query.record().indexOf("id");
+    while(query.next()) {
+        QString name = query.value(field_num).toString();
+        stringlist << name;
+    }
+
+    return stringlist;
+}
+
+int Client::is_exist(unsigned int id)
+{
+    QSqlQuery query;
+    
+    if(!query.prepare("SELECT id FROM client WHERE id=?")) {
+        qDebug() << "Client is exist prepere error: " << query.lastError();
+        return -1;
+    }
+    
+    query.addBindValue(id);
+    
+    if(!query.exec()) {
+        qDebug() << "Client is exist exec error: " << query.lastError();
+        return -1;
+    }
+    
+    if(!query.first()) return -1;
+    return query.value(0).toInt();
+}
