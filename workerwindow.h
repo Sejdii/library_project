@@ -24,6 +24,7 @@
 #include "lib/author.h"
 #include "lib/book.h"
 #include "lib/rent.h"
+#include "sqlconsole.h"
 
 class WorkerWindow : public QMainWindow
 {
@@ -52,6 +53,7 @@ public:
     void stage_book_scroll();
     void stage_rent_add();
     void stage_rent_scroll();
+    void stage_sql_console();
 
 public slots:
     void customMenuRequested(QPoint pos);
@@ -67,6 +69,7 @@ private:
     QMenu* publisherMenu;
     QMenu* rentsMenu;
     QMenu* accountMenu;
+    QMenu* databaseMenu;
 
     QAction* addWorker;
     QAction* scroolWorker;
@@ -79,6 +82,7 @@ private:
     QAction* publisher_scroll;
     QAction* action_rent_add;
     QAction* rent_scroll;
+    QAction* action_database_sql_console;
     QAction* action_menu_account_logout;
     QAction* action_menu_account_change_passwd;
     QAction* action_table_menu_delete;
@@ -135,6 +139,7 @@ private slots:
     void rent_scrollSlot();
     void account_changepasswdSlot();
     void account_logoutSlot();
+    void database_sql_consoleSlot();
 
     void worker_add();
     void account_changepasswd();

@@ -20,6 +20,7 @@ SOURCES += \
     clientwindow.cpp \
     main.cpp \
     mainwindow.cpp \
+    sqlconsole.cpp \
     src/address.cpp \
     src/author.cpp \
     src/book.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     lib/user.h \
     lib/worker.h \
     mainwindow.h \
+    sqlconsole.h \
     workerwindow.h
 
 FORMS +=

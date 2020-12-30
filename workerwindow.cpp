@@ -23,6 +23,9 @@ void WorkerWindow::setWindow()
 void WorkerWindow::create_menu()
 {
     if(w_type == WORKER_ADM_TYPE) { // ONLY FOR ADMIN
+        databaseMenu = menuBar()->addMenu(tr("&Baza"));
+        databaseMenu->addAction(action_database_sql_console);
+        
         workersMenu = menuBar()->addMenu(tr("&Pracownicy"));
         workersMenu->addAction(addWorker);
         workersMenu->addAction(scroolWorker);
@@ -94,6 +97,9 @@ void WorkerWindow::create_actions()
 
     action_menu_account_logout = new QAction(tr("&Wyloguj się"));
     connect(action_menu_account_logout, &QAction::triggered, this, &WorkerWindow::account_logoutSlot);
+    
+    action_database_sql_console = new QAction(tr("&Konsola SQL"));
+    connect(action_database_sql_console, &QAction::triggered, this, &WorkerWindow::database_sql_consoleSlot);
 
     // TABLE POP UP MENU
 
@@ -509,6 +515,12 @@ void WorkerWindow::end_rent_slot()
     
     QSqlRelationalTableModel* t_model = (QSqlRelationalTableModel*)(table->model());
     t_model->submitAll();
+}
+
+void WorkerWindow::database_sql_consoleSlot()
+{
+    SqlConsole* sqlconsole = new SqlConsole; // CREATING NEW WINDOW - SQL CONSOLE
+    sqlconsole->show();
 }
 
 // #################################
