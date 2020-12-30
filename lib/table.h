@@ -9,7 +9,7 @@ public:
     virtual int push() = 0;
 
     virtual bool validate(bool edit=false) = 0;
-
+    
 protected:
     unsigned int id;
 };

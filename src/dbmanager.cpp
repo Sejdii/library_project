@@ -113,6 +113,7 @@ bool DBManager::initial_database(const QString& path, bool force)
                   "client_id integer NOT NULL,"
                   "start_date date NOT NULL,"
                   "end_date date NOT NULL,"
+                  "ended date NULL,"
                   "FOREIGN KEY(book_id) REFERENCES book(id),"
                   "FOREIGN KEY(worker_id) REFERENCES worker(id),"
                   "FOREIGN KEY(client_id) REFERENCES client(id)"

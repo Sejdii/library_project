@@ -105,6 +105,11 @@ void WorkerWindow::create_actions()
     
     action_table_menu_copy_id = new QAction(tr("&Kopiuj ID"), this);
     connect(action_table_menu_copy_id, &QAction::triggered, this, &WorkerWindow::copy_id_slot);
+    
+    // TABLE RENT POP UP MENU
+    
+    action_table_menu_rent_end = new QAction(tr("&Zakończ wypożyczenie"), this);
+    connect(action_table_menu_rent_end, &QAction::triggered, this, &WorkerWindow::end_rent_slot);
 }
 
 void WorkerWindow::set_worker(unsigned int id)
@@ -283,6 +288,19 @@ void WorkerWindow::customMenuRequested(QPoint pos)
     tab_menu->addAction(action_table_menu_delete);
     tab_menu->addAction(action_table_menu_save);
     tab_menu->popup(table->viewport()->mapToGlobal(pos));
+}
+
+void WorkerWindow::customRentMenuRequested(QPoint pos)
+{
+    QModelIndex index = table->indexAt(pos);
+    table_row_id = index.row();
+    index = index.siblingAtColumn(0);
+    clipboard = index.data().toInt();
+    
+    QMenu* rent_menu = new QMenu(this);
+    rent_menu->addAction(action_table_menu_copy_id);
+    rent_menu->addAction(action_table_menu_rent_end);
+    rent_menu->popup(table->viewport()->mapToGlobal(pos));
 }
 
 void WorkerWindow::search_slot()
@@ -476,11 +494,21 @@ void WorkerWindow::book_add()
 
 void WorkerWindow::rent_add()
 {
-    Rent new_data(register_rent_book->text(), worker->getID(), register_rent_client->text().toUInt(), register_rent_time_start->dateTime().toString(), register_rent_time_end->dateTime().toString());
+    Rent new_data(register_rent_book->text(), worker->getID(), register_rent_client->text().toUInt(), register_rent_time_start->date().toString(), register_rent_time_end->date().toString());
     if(new_data.validate()) {
         new_data.push();
         setStage("scrollrent");
     }
+}
+
+void WorkerWindow::end_rent_slot()
+{
+    int id = clipboard;
+    
+    Rent::end_rent(id);
+    
+    QSqlRelationalTableModel* t_model = (QSqlRelationalTableModel*)(table->model());
+    t_model->submitAll();
 }
 
 // #################################
@@ -874,15 +902,24 @@ void WorkerWindow::stage_rent_scroll()
 {
     table = new QTableView;
 
-    QSqlTableModel* t_model = new QSqlTableModel;
+    QSqlRelationalTableModel* t_model = new QSqlRelationalTableModel;
     t_model->setTable("rent");
     t_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    t_model->setRelation(1, QSqlRelation("book", "id", "title"));
+    t_model->setRelation(2, QSqlRelation("worker", "id", "login"));
     t_model->select();
+    t_model->setHeaderData(1, Qt::Horizontal, tr("Tytuł książki"));
+    t_model->setHeaderData(2, Qt::Horizontal, tr("Login pracownika"));
+    t_model->setHeaderData(3, Qt::Horizontal, tr("Numer karty klienta"));
+    t_model->setHeaderData(4, Qt::Horizontal, tr("Początek wypożyczenia"));
+    t_model->setHeaderData(5, Qt::Horizontal, tr("Termin końca"));
+    t_model->setHeaderData(6, Qt::Horizontal, tr("Data zakończenia"));
 
     table->setModel(t_model);
+    table->hideColumn(0);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+    connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customRentMenuRequested(QPoint)));
     connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
     table->setSortingEnabled(true);
     table->show();

@@ -21,12 +21,15 @@ public:
     
     int push() override;
     
+    static bool end_rent(unsigned int id);
+    
 private:
     int book_id;
     int worker_id;
     int client_id;
     QString start_date;
     QString end_date;
+    QString ended;
 };
 
 #endif // RENT_H

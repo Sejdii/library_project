@@ -55,6 +55,7 @@ public:
 
 public slots:
     void customMenuRequested(QPoint pos);
+    void customRentMenuRequested(QPoint pos);
 
 private:
     QWidget* widget;
@@ -83,6 +84,7 @@ private:
     QAction* action_table_menu_delete;
     QAction* action_table_menu_save;
     QAction* action_table_menu_copy_id;
+    QAction* action_table_menu_rent_end;
 
     QLineEdit* register_worker_login;
     QLineEdit* register_worker_password;
@@ -145,6 +147,7 @@ private slots:
     void delete_slot();
     void save_slot();
     void copy_id_slot();
+    void end_rent_slot();
     void table_on_change();
 };
 

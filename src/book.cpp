@@ -173,7 +173,7 @@ bool Book::check_availability(unsigned int id)
 {
     QSqlQuery query_count;
     
-    if(!query_count.prepare("SELECT COUNT(id) FROM rent WHERE book_id=?")) {
+    if(!query_count.prepare("SELECT COUNT(id) FROM rent WHERE book_id=? AND ended IS NULL")) {
         qDebug() << "Book check availability prepere error: " << query_count.lastError();
         return false;
     }
@@ -211,9 +211,7 @@ bool Book::check_availability(unsigned int id)
     
     int items_nr = query_items.value(0).toInt();
     
-    qDebug() << rent_count << " " << items_nr;
-    
-    if(rent_count == items_nr) {
+    if(rent_count >= items_nr) {
         return false;
     }
     
