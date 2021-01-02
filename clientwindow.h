@@ -2,16 +2,41 @@
 #define CLIENTWINDOW_H
 
 #include <QMainWindow>
+#include <QLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QtSql>
+#include <QLabel>
+#include <QTableView>
 
-class ClientWindow : public QWidget
+#include "lib/client.h" 
+
+class ClientWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit ClientWindow();
+    explicit ClientWindow(unsigned int id);
 
     void setWindow();
+    
+    QHBoxLayout* getSearchBox(QString value="");
+    
+    QTableView* get_search_result(QString like="");
 
-signals:
+private:
+    void stage_main_stage(QString like="");
+    
+    Client* client;
+    
+    QWidget* widget;
+    
+    QLineEdit* search_input;
+    
+    QTableView* search_result;
+    
+private slots:
+    
+    void search_slot();
 
 };
 

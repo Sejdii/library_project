@@ -847,12 +847,13 @@ void WorkerWindow::stage_book_scroll()
     t_model->setHeaderData(1, Qt::Horizontal, tr("ISBN"));
     t_model->setHeaderData(2, Qt::Horizontal, tr("Tytuł"));
     t_model->setHeaderData(4, Qt::Horizontal, tr("Rok opublikowania"));
-    t_model->setHeaderData(5, Qt::Horizontal, tr("Opis"));
+    //t_model->setHeaderData(5, Qt::Horizontal, tr("Opis"));
     t_model->setHeaderData(6, Qt::Horizontal, tr("Liczba egzemplarzy"));
 
     table->setModel(t_model);
     table->hideColumn(0);
     table->hideColumn(3);
+    table->hideColumn(5);
     table->hideColumn(7);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setContextMenuPolicy(Qt::CustomContextMenu);

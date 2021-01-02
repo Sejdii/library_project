@@ -8,6 +8,11 @@ Client::Client(QString pesel, QString name, QString surname, QString email)
     this->email = email;
 }
 
+Client::Client(unsigned int id)
+{
+    this->fetch_by_id(id);
+}
+
 bool Client::validate(bool edit)
 {
     bool flag = true;
@@ -156,4 +161,37 @@ int Client::is_exist(unsigned int id)
     
     if(!query.first()) return -1;
     return query.value(0).toInt();
+}
+
+bool Client::fetch_by_id(unsigned int id)
+{
+    this->id = id;
+    
+    QSqlQuery query;
+    
+    if(!query.prepare("SELECT * FROM client WHERE id=?")) {
+        qDebug() << "Client fetch by id prepere error: " << query.lastError();
+        return false;
+    }
+    
+    query.addBindValue(id);
+    
+    if(!query.exec()) {
+        qDebug() << "Client fetch by id exec error: " << query.lastError();
+        return false;
+    }
+    
+    if(query.first()) {
+        login = query.value(1).toString();
+        password = query.value(2).toString();
+        pesel = query.value(3).toString();
+        name = query.value(4).toString();
+        surname = query.value(5).toString();
+        email = query.value(6).toString();
+        address_id = query.value(7).toInt();
+        
+        return true;
+    }
+    
+    return false;
 }

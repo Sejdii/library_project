@@ -20,6 +20,7 @@ private:
 
 public:
     Client(QString pesel, QString name, QString surname, QString email);
+    Client(unsigned int id);
 
     bool validate(bool edit=false);
     bool email_unique();
@@ -28,6 +29,8 @@ public:
     void set_addr(unsigned int id);
 
     int push();
+    
+    bool fetch_by_id(unsigned int id);
     
     static QStringList get_completer_list();
     

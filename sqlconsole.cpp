@@ -12,9 +12,22 @@ SqlConsole::SqlConsole(QWidget *parent) : QMainWindow(parent)
 void SqlConsole::set_window()
 {
     setMinimumSize(400, 300);
-    resize(800, 600);
+    resize(700, 500);
     setWindowTitle("Konsola SQL");
 }
+
+void SqlConsole::onsubmit()
+{
+    QSqlQueryModel* model = new QSqlQueryModel;
+    model->setQuery(query_text->text());
+    model->submit();
+    
+    table->setModel(model);
+}
+
+// #################################
+// #            STAGES             #
+// #################################
 
 void SqlConsole::stage_main()
 {
@@ -32,13 +45,4 @@ void SqlConsole::stage_main()
     layout->addWidget(table);
     
     widget->setLayout(layout);
-}
-
-void SqlConsole::onsubmit()
-{
-    QSqlQueryModel* model = new QSqlQueryModel;
-    model->setQuery(query_text->text());
-    model->submit();
-    
-    table->setModel(model);
 }

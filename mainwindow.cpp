@@ -93,8 +93,9 @@ void MainWindow::loginClientSlot()
     User user_data(login_login->text(), login_password->text());
     user_data.password_hash();
     if(user_data.verify(ACCOUNT_CLIENT)) {
-        ClientWindow* cwindow = new ClientWindow;
+        ClientWindow* cwindow = new ClientWindow(user_data.getID()); // CREATING NEW WINDOW - CLIENT WINDOW
         cwindow->show();
+        close();
     }
 }
 
