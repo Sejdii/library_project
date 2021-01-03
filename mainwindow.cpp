@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include <lib/dbmanager.h>
 
 MainWindow::MainWindow(QWidget *parent)
