@@ -385,6 +385,28 @@ void WorkerWindow::delete_slot()
         }
     }
     
+    if(t_model->tableName() == "book") {
+        int book_id = t_record.value(0).toInt();
+        QSqlQuery query;
+        
+        if(!query.prepare("SELECT id FROM rent WHERE book_id=? AND ended IS NULL")) {
+            qDebug() << "delete slot book prepere error: " << query.lastError();
+            return;
+        }
+        
+        query.addBindValue(book_id);
+        
+        if(!query.exec()) {
+            qDebug() << "delete slot book exec error: " << query.lastError();
+            return;
+        }
+        if(query.first()) {
+            QMessageBox hint;
+            hint.warning(nullptr, "Blokada dostępu" , "Nie można usunąć książki która jest aktualnie wypożyczana");
+            return;
+        }
+    }
+    
     t_model->removeRow(table_row_id);
     t_model->submitAll();
 }
