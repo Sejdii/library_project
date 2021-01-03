@@ -32,6 +32,7 @@ private:
     void stage_check_availability();
     void stage_not_ended_rents();
     void stage_all_rents();
+    void stage_change_password();
     
     Client* client;
     
@@ -39,6 +40,8 @@ private:
     
     QLineEdit* search_input;
     QLineEdit* check_isbn;
+    QLineEdit* input_change_password_old;
+    QLineEdit* input_change_password_new;
     
     QTableView* search_result;
     
@@ -57,6 +60,7 @@ private slots:
     
     void search_slot();
     void check_availability_slot();
+    void change_password_slot();
     
     void slot_menu_check_availability();
     void slot_menu_change_password();

@@ -76,8 +76,9 @@ QTableView* ClientWindow::get_search_result(QString like)
 
 void ClientWindow::create_menu()
 {
-    /*
+    /* --------------
      * MENU HIERARCHY
+     * --------------
      * 
      * Narzędzia
      *  --> Szukaj książki
@@ -142,7 +143,7 @@ void ClientWindow::slot_menu_check_availability()
 
 void ClientWindow::slot_menu_change_password()
 {
-    qDebug() << "menu change passwd";
+    stage_change_password();
 }
 
 void ClientWindow::slot_menu_logout()
@@ -182,6 +183,19 @@ void ClientWindow::check_availability_slot()
     
     QMessageBox hint;
     hint.warning(nullptr, "Informacja o dostępności książki", info);
+}
+
+void ClientWindow::change_password_slot()
+{
+    QString old_password = input_change_password_old->text();
+    QString new_password = input_change_password_new->text();
+    
+    if(client->compare_passwords(User::password_hash(old_password), true)) {
+        if(client->change_password(new_password, ACCOUNT_CLIENT)) {
+            QMessageBox hint;
+            hint.information(nullptr, "Zmiana hasła", "Pomyślna zmiana hasła");
+        }
+    }
 }
 
 // #################################
@@ -285,6 +299,33 @@ void ClientWindow::stage_all_rents()
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(label);
     layout->addWidget(table);
+    
+    layout->setAlignment(Qt::AlignTop);
+    
+    qDeleteAll(widget->children());
+    widget->setLayout(layout);
+}
+
+void ClientWindow::stage_change_password()
+{
+    QLabel* label = new QLabel(tr("<h1>Zmień swoje hasło</h1>"));
+    
+    input_change_password_old = new QLineEdit;
+    input_change_password_old->setPlaceholderText("Twoje obecne hasło");
+    input_change_password_old->setEchoMode(QLineEdit::Password);
+    
+    input_change_password_new = new QLineEdit;
+    input_change_password_new->setPlaceholderText("Twoje nowe hasło");
+    input_change_password_new->setEchoMode(QLineEdit::Password);
+    
+    QPushButton* button = new QPushButton("Zmień hasło");
+    connect(button, SIGNAL(released()), this, SLOT(change_password_slot()));
+    
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(label);
+    layout->addWidget(input_change_password_old);
+    layout->addWidget(input_change_password_new);
+    layout->addWidget(button);
     
     layout->setAlignment(Qt::AlignTop);
     
