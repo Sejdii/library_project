@@ -22,6 +22,7 @@
 #include <QClipboard>
 #include <QGuiApplication>
 #include <QDateTimeEdit>
+#include <QVector>
 
 #include "lib/worker.h"
 #include "lib/client.h"
@@ -198,6 +199,8 @@ private:
     int table_row_id; /**< ID wiersza w tabeli */
     
     int clipboard; /**< Schowek */
+    
+    bool table_row_edited = false; /**< Określa czy dokonała się zmiana w którymś wierszu tabeli */
 
 private slots:
     void addWorkerSlot();
@@ -228,6 +231,7 @@ private slots:
     void copy_id_slot();
     void end_rent_slot();
     void table_on_change();
+    void table_changed(const QModelIndex& index);
 };
 
 #endif // WORKERWINDOW_H

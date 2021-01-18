@@ -23,9 +23,12 @@ void SqlConsole::onsubmit()
 {
     QSqlQueryModel* model = new QSqlQueryModel;
     model->setQuery(query_text->text());
-    model->submit();
-    
     table->setModel(model);
+    
+    if (model->lastError().type() != QSqlError::NoError) {
+        QMessageBox hint;
+        hint.warning(nullptr, "Wystąpił błąd zapytania", model->lastError().text());
+    }
 }
 
 // #################################
@@ -44,9 +47,12 @@ void SqlConsole::stage_main()
     table = new QTableView;
     table->setStyleSheet(Color::get_table_header_style());
     
+    QLabel* label = new QLabel("<i>Konsola służy do wyświetlania poleceń SELECT w postaci tabeli </i>");
+    
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(query_text);
     layout->addWidget(button);
+    layout->addWidget(label);
     layout->addWidget(table);
     
     widget->setLayout(layout);

@@ -129,6 +129,7 @@ void WorkerWindow::set_worker(unsigned int id)
 
 void WorkerWindow::setStage(QString stage)
 {
+    table_row_edited = false;
     if(stage == "homepage") {
         stage_homepage();
     }
@@ -473,8 +474,24 @@ void WorkerWindow::copy_id_slot()
 
 void WorkerWindow::table_on_change()
 {
+    if(!table_row_edited) return;
+    
     QSqlTableModel* t_model = (QSqlTableModel*)(table->model());
-    t_model->revertAll();
+    QMessageBox::StandardButton replay;
+    
+    replay = QMessageBox::question(this, "Czy zapisać?", "Czy chcesz zapisać dokonane zmiany?", QMessageBox::Yes | QMessageBox::No);
+    if(replay == QMessageBox::Yes) {
+        save_slot();
+    } else {
+        t_model->revertAll();
+    }
+    table_row_edited = false;
+}
+
+void WorkerWindow::table_changed(const QModelIndex& index)
+{
+    table_row_edited = true;
+    table_row_id = index.row();
 }
 
 void WorkerWindow::account_changepasswd()
@@ -633,6 +650,7 @@ void WorkerWindow::stage_scrollworker()
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
     connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    connect(table->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(table_changed(QModelIndex)));
     table->setSortingEnabled(true);
     table->show();
 
@@ -694,6 +712,7 @@ void WorkerWindow::stage_client_scroll()
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
     connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    connect(table->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(table_changed(QModelIndex)));
     table->setSortingEnabled(true);
     table->show();
 
@@ -751,6 +770,7 @@ void WorkerWindow::stage_publisher_scroll()
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
     connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    connect(table->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(table_changed(QModelIndex)));
     table->setSortingEnabled(true);
     table->show();
 
@@ -808,6 +828,7 @@ void WorkerWindow::stage_author_scroll()
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
     connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    connect(table->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(table_changed(QModelIndex)));
     table->setSortingEnabled(true);
     table->show();
 
@@ -895,6 +916,7 @@ void WorkerWindow::stage_book_scroll()
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
     connect(table->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(table_on_change()));
+    connect(table->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(table_changed(QModelIndex)));
     table->setSortingEnabled(true);
     table->show();
 

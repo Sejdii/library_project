@@ -12,6 +12,9 @@
 #include <QtSql>
 #include <QTableView>
 #include <QPushButton>
+#include <QLabel>
+#include <QMessageBox>
+#include <QSqlQuery>
 
 #include <lib/color.h>
 
