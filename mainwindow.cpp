@@ -18,6 +18,7 @@ void MainWindow::setWindow()
 
     this->create_actions();
     this->create_menu();
+    this->setStyleSheet(Color::get_window_style());
 }
 
 void MainWindow::setStage(QString stage)
@@ -148,6 +149,7 @@ void MainWindow::stage_login_worker()
     form->addRow(tr("&Hasło"), login_password);
 
     QPushButton* login_button = new QPushButton(tr("&Zaloguj się"));
+    login_button->setStyleSheet(Color::get_button_style());
     connect(login_button, SIGNAL(released()), this, SLOT(loginWorkerSlot()));
 
     QVBoxLayout* layout = new QVBoxLayout;
@@ -164,6 +166,7 @@ void MainWindow::stage_homepage()
 {
     widget = new QWidget;
     setCentralWidget(widget);
+    widget->setStyleSheet(Color::get_widget_style());
 
     QLabel* hello_label = new QLabel(tr("<b style='font-size:24px'>Witaj w bibliotecznej bazie danych</b>"));
     hello_label->setAlignment(Qt::AlignCenter);
@@ -173,7 +176,9 @@ void MainWindow::stage_homepage()
 
     QHBoxLayout* buttons = new QHBoxLayout;
     QPushButton* button_login = new QPushButton("&Zaloguj się", this);
+    button_login->setStyleSheet(Color::get_button_style());
     QPushButton* button_register = new QPushButton("&Zarejestruj się", this);
+    button_register->setStyleSheet(Color::get_button_style());
     connect(button_login, SIGNAL(released()), this, SLOT(loginAsClientSlot()));
     connect(button_register, SIGNAL(released()), this, SLOT(registerAsClientSlot()));
     buttons->addWidget(button_login);
@@ -206,6 +211,7 @@ void MainWindow::stage_login_client()
     form->addRow(tr("&Hasło"), login_password);
 
     QPushButton* login_button = new QPushButton(tr("&Zaloguj się"));
+    login_button->setStyleSheet(Color::get_button_style());
     connect(login_button, SIGNAL(released()), this, SLOT(loginClientSlot()));
 
     QVBoxLayout* layout = new QVBoxLayout;
@@ -283,6 +289,7 @@ void MainWindow::stage_register_client()
     forms_layout->addLayout(address);
 
     QPushButton* register_button = new QPushButton(tr("&Zarejestruj się"));
+    register_button->setStyleSheet(Color::get_button_style());
     connect(register_button, SIGNAL(released()), this, SLOT(registerClientSlot()));
 
     QVBoxLayout* layout = new QVBoxLayout;

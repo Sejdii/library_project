@@ -18,6 +18,7 @@
 
 #include "lib/client.h" 
 #include "lib/book.h"
+#include "lib/color.h"
 
 /**
  * @brief Klasa ClientWindow, obsługująca operacje na oknie części bazy danych poświęconej klientom

@@ -7,6 +7,7 @@ ClientWindow::ClientWindow(unsigned int id)
     
     widget = new QWidget;
     setCentralWidget(widget);
+    widget->setStyleSheet(Color::get_widget_style());
     
     stage_main_stage();
 }
@@ -18,6 +19,7 @@ void ClientWindow::setWindow()
     setWindowTitle("Witaj kliencie");
     
     this->create_menu();
+    this->setStyleSheet(Color::get_window_style());
 }
 
 QHBoxLayout* ClientWindow::getSearchBox(QString value)
@@ -26,6 +28,7 @@ QHBoxLayout* ClientWindow::getSearchBox(QString value)
     search_input->setText(value);
     search_input->setPlaceholderText("Wpisz tekst który chcesz wyszukać");
     QPushButton* search_button = new QPushButton(tr("&Wyszukaj"));
+    search_button->setStyleSheet(Color::get_button_style());
     connect(search_button, SIGNAL(released()), this, SLOT(search_slot()));
 
     QHBoxLayout* search_box = new QHBoxLayout;
@@ -39,6 +42,7 @@ QTableView* ClientWindow::get_search_result(QString like)
 {
     QSqlQuery query;
     QTableView* layout = new QTableView;
+    layout->setStyleSheet(Color::get_table_header_style());
     
     if(like.length() > 0) {
         like = "%" + like + "%";
@@ -222,6 +226,7 @@ void ClientWindow::stage_check_availability()
     check_isbn->setPlaceholderText("Wprowadź ISBN");
     
     QPushButton* button = new QPushButton("Sprawdź");
+    button->setStyleSheet(Color::get_button_style());
     connect(button, SIGNAL(released()), this, SLOT(check_availability_slot()));
     
     QVBoxLayout* layout = new QVBoxLayout;
@@ -240,6 +245,7 @@ void ClientWindow::stage_not_ended_rents()
     QLabel* label = new QLabel(tr("<h1>Twoje aktywne wypożyczenia</h1>"));
     
     QTableView* table = new QTableView;
+    table->setStyleSheet(Color::get_table_header_style());
     
     QSqlQuery query;
     if(!query.prepare("SELECT b.title,  r.start_date, r.end_date  FROM rent as r INNER JOIN book as  b ON r.book_id=b.id WHERE client_id=? AND ended IS NULL")) {
@@ -275,6 +281,7 @@ void ClientWindow::stage_all_rents()
     QLabel* label = new QLabel(tr("<h1>Historia twoich zakończonych wypożyczeń</h1>"));
     
     QTableView* table = new QTableView;
+    table->setStyleSheet(Color::get_table_header_style());
     
     QSqlQuery query;
     if(!query.prepare("SELECT b.title,  r.start_date, r.end_date, r.ended  FROM rent as r INNER JOIN book as  b ON r.book_id=b.id WHERE client_id=? AND ended IS NOT NULL")) {
@@ -319,6 +326,7 @@ void ClientWindow::stage_change_password()
     input_change_password_new->setEchoMode(QLineEdit::Password);
     
     QPushButton* button = new QPushButton("Zmień hasło");
+    button->setStyleSheet(Color::get_button_style());
     connect(button, SIGNAL(released()), this, SLOT(change_password_slot()));
     
     QVBoxLayout* layout = new QVBoxLayout;

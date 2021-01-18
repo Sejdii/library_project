@@ -13,6 +13,8 @@
 #include <QTableView>
 #include <QPushButton>
 
+#include <lib/color.h>
+
 /**
  * @brief Klasa SqlConsole odpowiadająca za wyświetlanie oraz obsługę okna konsoli SQL
  */

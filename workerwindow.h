@@ -29,6 +29,7 @@
 #include "lib/author.h"
 #include "lib/book.h"
 #include "lib/rent.h"
+#include "lib/color.h"
 #include "sqlconsole.h"
 
 /**

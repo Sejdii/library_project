@@ -6,6 +6,7 @@ WorkerWindow::WorkerWindow(unsigned int id, QWidget *parent) : QMainWindow(paren
     setWindow();
     widget = new QWidget;
     setCentralWidget(widget);
+    widget->setStyleSheet(Color::get_widget_style());
 
     setStage("homepage");
 }
@@ -15,6 +16,7 @@ void WorkerWindow::setWindow()
     setMinimumSize(500, 400);
     resize(800, 600);
     setWindowTitle("Baza danych biblioteki - zalogowano jako pracownik");
+    this->setStyleSheet(Color::get_window_style());
 
     create_actions();
     create_menu();
@@ -185,6 +187,7 @@ QHBoxLayout* WorkerWindow::getSearchBox()
     search_input = new QLineEdit;
     search_input->setPlaceholderText("Wpisz tekst który chcesz wyszukać");
     QPushButton* search_button = new QPushButton(tr("&Wyszukaj"));
+    search_button->setStyleSheet(Color::get_button_style());
     connect(search_button, SIGNAL(released()), this, SLOT(search_slot()));
 
     QHBoxLayout* search_box = new QHBoxLayout;
@@ -551,10 +554,11 @@ void WorkerWindow::database_sql_consoleSlot()
 
 void WorkerWindow::stage_homepage()
 {
-    QLabel* hello_label = new QLabel(QString("<h1>Witaj <b>%1</b></h1>").arg(worker->getName()));
+    QLabel* hello_label = new QLabel(QString("<h1 style='text-align:center;'>Witaj <b>%1</b></h1>").arg(worker->getName()));
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(hello_label);
+    layout->setAlignment(Qt::AlignTop);
 
     widget->setLayout(layout);
 }
@@ -594,6 +598,7 @@ void WorkerWindow::stage_addworker()
     form->addRow(tr("&Nazwisko"), register_worker_surname);
 
     QPushButton* register_button = new QPushButton(tr("&Dodaj użytkownika"));
+    register_button->setStyleSheet(Color::get_button_style());
     connect(register_button, SIGNAL(released()), this, SLOT(worker_add()));
 
 
@@ -621,6 +626,7 @@ void WorkerWindow::stage_scrollworker()
     t_model->setHeaderData(5, Qt::Horizontal, tr("Nazwisko"));
 
     table->setModel(t_model);
+    table->setStyleSheet(Color::get_table_header_style());
     table->hideColumn(0);
     table->hideColumn(3);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -653,6 +659,7 @@ void WorkerWindow::stage_changepasswd()
     form->addRow(tr("&Nowe hasło"), register_worker_password_repeat);
 
     QPushButton* change_passwd_button = new QPushButton(tr("&Zmień swoje hasło"));
+    change_passwd_button->setStyleSheet(Color::get_button_style());
     connect(change_passwd_button, SIGNAL(released()), this, SLOT(account_changepasswd()));
 
     QVBoxLayout* layout = new QVBoxLayout;
@@ -680,6 +687,7 @@ void WorkerWindow::stage_client_scroll()
     t_model->setHeaderData(6, Qt::Horizontal, tr("E-mail"));
 
     table->setModel(t_model);
+    table->setStyleSheet(Color::get_table_header_style());
     table->hideColumn(2);
     table->hideColumn(7);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -712,6 +720,7 @@ void WorkerWindow::stage_publisher_add()
     form->addRow(tr("&Krótki opis"), register_publisher_description);
 
     QPushButton* add_publisher_button = new QPushButton(tr("&Dodaj wydawce"));
+    add_publisher_button->setStyleSheet(Color::get_button_style());
     connect(add_publisher_button, SIGNAL(released()), this, SLOT(publisher_add()));
 
     QVBoxLayout* layout = new QVBoxLayout;
@@ -736,6 +745,7 @@ void WorkerWindow::stage_publisher_scroll()
     t_model->setHeaderData(2, Qt::Horizontal, tr("Opis"));
 
     table->setModel(t_model);
+    table->setStyleSheet(Color::get_table_header_style());
     table->hideColumn(0);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -767,6 +777,7 @@ void WorkerWindow::stage_author_add()
     form->addRow(tr("&Nazwisko"), register_author_surname);
 
     QPushButton* add_publisher_button = new QPushButton(tr("&Dodaj autora"));
+    add_publisher_button->setStyleSheet(Color::get_button_style());
     connect(add_publisher_button, SIGNAL(released()), this, SLOT(author_add()));
 
     QVBoxLayout* layout = new QVBoxLayout;
@@ -791,6 +802,7 @@ void WorkerWindow::stage_author_scroll()
     t_model->setHeaderData(2, Qt::Horizontal, tr("Nazwisko"));
 
     table->setModel(t_model);
+    table->setStyleSheet(Color::get_table_header_style());
     table->hideColumn(0);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -846,6 +858,7 @@ void WorkerWindow::stage_book_add()
     form->addRow("Wybierz autora", register_book_author);
 
     QPushButton* add_book_button = new QPushButton(tr("&Dodaj książkę"));
+    add_book_button->setStyleSheet(Color::get_button_style());
     connect(add_book_button, SIGNAL(released()), this, SLOT(book_add()));
 
     QVBoxLayout* layout = new QVBoxLayout;
@@ -873,6 +886,7 @@ void WorkerWindow::stage_book_scroll()
     t_model->setHeaderData(6, Qt::Horizontal, tr("Liczba egzemplarzy"));
 
     table->setModel(t_model);
+    table->setStyleSheet(Color::get_table_header_style());
     table->hideColumn(0);
     table->hideColumn(3);
     table->hideColumn(5);
@@ -921,6 +935,7 @@ void WorkerWindow::stage_rent_add()
     form->addRow(tr("Wprowadź datę końca wypożyczenia"), register_rent_time_end);
     
     QPushButton* submit_button = new QPushButton(tr("&Dodaj wypożyczenie"));
+    submit_button->setStyleSheet(Color::get_button_style());
     connect(submit_button, SIGNAL(released()), this, SLOT(rent_add()));
     
     QVBoxLayout* layout = new QVBoxLayout;
@@ -951,6 +966,7 @@ void WorkerWindow::stage_rent_scroll()
     t_model->setHeaderData(6, Qt::Horizontal, tr("Data zakończenia"));
 
     table->setModel(t_model);
+    table->setStyleSheet(Color::get_table_header_style());
     table->hideColumn(0);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setContextMenuPolicy(Qt::CustomContextMenu);

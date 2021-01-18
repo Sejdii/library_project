@@ -25,6 +25,7 @@ SOURCES += \
     src/author.cpp \
     src/book.cpp \
     src/client.cpp \
+    src/color.cpp \
     src/dbmanager.cpp \
     src/publisher.cpp \
     src/rent.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
     lib/author.h \
     lib/book.h \
     lib/client.h \
+    lib/color.h \
     lib/dbmanager.h \
     lib/publisher.h \
     lib/rent.h \
@@ -55,3 +57,6 @@ FORMS +=
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    MyResources.qrc

@@ -5,6 +5,7 @@ SqlConsole::SqlConsole(QWidget *parent) : QMainWindow(parent)
     this->set_window();
     widget = new QWidget;
     setCentralWidget(widget);
+    widget->setStyleSheet(Color::get_widget_style());
     
     stage_main();
 }
@@ -14,6 +15,8 @@ void SqlConsole::set_window()
     setMinimumSize(400, 300);
     resize(700, 500);
     setWindowTitle("Konsola SQL");
+    
+    this->setStyleSheet(Color::get_window_style());
 }
 
 void SqlConsole::onsubmit()
@@ -35,9 +38,11 @@ void SqlConsole::stage_main()
     query_text->setPlaceholderText("Wpisz tutaj polecenie SQL");
     
     QPushButton* button = new QPushButton(tr("Wykonaj"));
+    button->setStyleSheet(Color::get_button_style());
     connect(button, SIGNAL(released()), this, SLOT(onsubmit()));
     
     table = new QTableView;
+    table->setStyleSheet(Color::get_table_header_style());
     
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(query_text);

@@ -12,10 +12,12 @@
 #include <QDateEdit>
 #include <QSpinBox>
 #include <QShortcut>
+#include <QFontDatabase>
 
 #include <lib/address.h>
 #include "lib/client.h"
 #include "lib/user.h"
+#include "lib/color.h"
 #include "clientwindow.h"
 #include "workerwindow.h"
 
