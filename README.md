@@ -1,0 +1,2 @@
+# Biblioteka filmów
+Graficzna aplikacja biblioteki filmów, pozwalające na operacje zarówno jako klient jak i pracownik. Aplikacja korzysta z pliku bazy danych do przechowania danych. Klientom umożlwia dokonywać wypożyczeń oraz przeglądać swoje wypożyczenia. Jako pracownik można przeglądać wszystkie wypożyczenia, dodawać, edytować oraz usuwać książki, pracowników, klientów, autorów, wydawców oraz wypożyczenia.
